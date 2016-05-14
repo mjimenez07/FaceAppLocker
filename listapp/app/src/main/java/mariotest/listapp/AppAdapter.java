@@ -64,7 +64,6 @@ public class AppAdapter  extends BaseAdapter {
 
 
     class CompleteListViewHolder {
-         //TODO
         public ImageView appIcon;
         public TextView appName;
 
