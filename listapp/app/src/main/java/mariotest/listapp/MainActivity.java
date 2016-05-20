@@ -8,6 +8,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -15,11 +16,13 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
 public class MainActivity extends ListActivity {
 
     private PackageManager packageManager = null;
     private List<ApplicationInfo> applist = null;
+    private Vector<ApplicationInstalled> appInstaledlist = new Vector<ApplicationInstalled>();
     private AppAdapter listadapter = null;
 
     @Override
@@ -34,19 +37,10 @@ public class MainActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        ApplicationInfo app = applist.get(position);
-
-        try {
-            Intent intent = packageManager.getLaunchIntentForPackage(app.packageName);
-            if (intent != null) {
-                startActivity(intent);
-            }
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-        } catch (Exception e) {
-            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-        }
+        ApplicationInstalled app = (ApplicationInstalled) listadapter.getItem(position);
+        app.setIsActive(!app.isActive());
+        listadapter.notifyDataSetChanged();
+        Log.v("app name",app.getAppInfo().packageName);
     }
 
     private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
@@ -54,9 +48,9 @@ public class MainActivity extends ListActivity {
 
         for (ApplicationInfo application : list) {
             try {
-
-                if ((application.flags & ApplicationInfo.FLAG_SYSTEM ) != 1) {
-                    appList.add(application);
+                Log.v("app name", (application.flags & ApplicationInfo.FLAG_SYSTEM) + " " + application.packageName);
+                if (((application.flags & ApplicationInfo.FLAG_SYSTEM) == 0) || (application.packageName.contains("google"))) {
+                    appInstaledlist.add(new ApplicationInstalled(application, false));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -73,7 +67,7 @@ public class MainActivity extends ListActivity {
         @Override
         protected Void doInBackground(Void... params) {
             applist = checkForLaunchIntent(packageManager.getInstalledApplications(packageManager.GET_META_DATA));
-            listadapter = new AppAdapter(MainActivity.this, applist);
+            listadapter = new AppAdapter(MainActivity.this, appInstaledlist);
             return null;
         }
 

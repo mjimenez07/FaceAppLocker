@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
@@ -17,11 +18,11 @@ import java.util.List;
 
 public class AppAdapter  extends BaseAdapter {
     private Activity appContext;
-    private List<ApplicationInfo> appList;
+    private List<ApplicationInstalled> appList;
     private LayoutInflater layoutInflater;
     private PackageManager packManager;
 
-    public AppAdapter(Activity context, List<ApplicationInfo> objects){
+    public AppAdapter(Activity context, List<ApplicationInstalled> objects){
         appContext = context;
         appList = objects;
         layoutInflater = (LayoutInflater) appContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -56,9 +57,10 @@ public class AppAdapter  extends BaseAdapter {
         }else {
             viewHolder = (CompleteListViewHolder) view.getTag();
         }
-        ApplicationInfo appInfo = appList.get(position);
-        viewHolder.appIcon.setImageDrawable(appInfo.loadIcon(packManager));
-        viewHolder.appName.setText(appInfo.loadLabel(packManager));
+        ApplicationInstalled appInfo = appList.get(position);
+        viewHolder.appIcon.setImageDrawable(appInfo.getAppInfo().loadIcon(packManager));
+        viewHolder.appName.setText(appInfo.getAppInfo().loadLabel(packManager));
+        viewHolder.aSwitch.setChecked(appInfo.isActive());
         return view;
     }
 
@@ -66,11 +68,12 @@ public class AppAdapter  extends BaseAdapter {
     class CompleteListViewHolder {
         public ImageView appIcon;
         public TextView appName;
+        public Switch aSwitch;
 
         public CompleteListViewHolder(View base) {
             appIcon = (ImageView) base.findViewById(R.id.app_icon);
             appName = (TextView) base.findViewById(R.id.app_name);
-
+            aSwitch = (Switch) base.findViewById(R.id.list_toggle);
         }
     }
 }
