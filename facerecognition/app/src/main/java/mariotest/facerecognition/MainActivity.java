@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,10 +28,11 @@ public class MainActivity extends AppCompatActivity {
     /** Check if this device has a camera */
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-            // this device has a camera
+            Log.d("Success: ", "The device has a camera");
             return true;
         } else {
             // no camera on this device
+            Log.d("Error: ", "The device doesn't has a camera");
             return false;
         }
     }
@@ -43,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
         }
         catch (Exception e){
             // Camera is not available (in use or does not exist)
+            Log.d("Error:", "The camera couldn't be opened");
         }
         return c; // returns null if camera is unavailable
     }
 
-    }
+}
