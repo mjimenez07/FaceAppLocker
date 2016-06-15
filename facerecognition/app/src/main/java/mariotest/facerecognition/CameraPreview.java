@@ -1,11 +1,12 @@
 package mariotest.facerecognition;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
+import android.hardware.Camera.Face;
 import java.io.IOException;
 
 /**
@@ -18,8 +19,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public CameraPreview(Context context, Camera camera) {
         super(context);
         mCamera = camera;
-        mCamera.setFaceDetectionListener(new MyFaceDetectionListener());
-
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
         mHolder = getHolder();
@@ -35,7 +34,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setDisplayOrientation(90);
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
-            mCamera.setFaceDetectionListener(new MyFaceDetectionListener());
             mCamera.startFaceDetection();
         } catch (IOException e) {
             Log.d(VIEW_LOG_TAG, "Error setting camera preview: " + e.getMessage());
@@ -68,7 +66,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
-
+            mCamera.startFaceDetection();
         } catch (Exception e){
             Log.d(VIEW_LOG_TAG, "Error starting camera preview: " + e.getMessage());
         }
@@ -83,4 +81,34 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mCamera.release();
         mCamera = null;
     }
+
+
+    public void startFaceDetection(){
+        // Try starting Face Detection
+        Camera.Parameters params = mCamera.getParameters();
+
+        // start face detection only *after* preview has started
+        if (params.getMaxNumDetectedFaces() > 0){
+            Log.d("Something", "Detected");
+            // camera supports face detection, so can start it:
+            mCamera.setFaceDetectionListener(new MyFaceDetectionListener());
+        } else {
+            Log.d("Nothing","detected");
+        }
+    }
+
+    public class MyFaceDetectionListener implements Camera.FaceDetectionListener {
+
+        @Override
+        public void onFaceDetection(Face[] faces, Camera camera) {
+            if (faces.length > 0){
+                Log.d("FaceDetection", "face detected: "+ faces.length +
+                        " Face 1 Location X: " + faces[0].rect.centerX() +
+                        "Y: " + faces[0].rect.centerY() );
+            } else {
+                Log.d("nada","nada");
+            }
+        }
+    }
+
 }
