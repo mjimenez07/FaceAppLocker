@@ -1,7 +1,6 @@
 package mariotest.facerecognition;
 
 import android.content.Context;
-import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -34,7 +33,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.setDisplayOrientation(90);
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
-            mCamera.startFaceDetection();
+            startFaceDetection();
         } catch (IOException e) {
             Log.d(VIEW_LOG_TAG, "Error setting camera preview: " + e.getMessage());
             mCamera.release();
@@ -66,7 +65,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         try {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
-            mCamera.startFaceDetection();
+            startFaceDetection();
         } catch (Exception e){
             Log.d(VIEW_LOG_TAG, "Error starting camera preview: " + e.getMessage());
         }
