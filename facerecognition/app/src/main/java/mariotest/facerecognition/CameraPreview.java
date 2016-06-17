@@ -94,10 +94,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         public void onFaceDetection(Face[] faces, Camera camera) {
             if (faces.length > 0){
                 Log.d("FaceDetection", "face detected: "+ faces.length +
-                        " Face 1 Location X: " + faces[0].rect.centerX() +
-                        "Y: " + faces[0].rect.centerY() );
+                        " Left Eye location: " + faces[0].leftEye +
+                        " Right Eye location: " + faces[0].rightEye +
+                        " Mouth location: " + faces[0].mouth);
             } else {
-                Log.d("nada","nada");
+                Log.d("No face detected", ":/");
             }
         }
     }
