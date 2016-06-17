@@ -2,6 +2,7 @@ package mariotest.facerecognition;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -21,7 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void captureButton(View view) {
-        mPreview.takePicture();
+//        mPreview.callTakePicture();
+        Log.d("TODO!:","A few errors on capture pictures callback");
     }
 
 }
