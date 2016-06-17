@@ -9,7 +9,6 @@ import android.util.Log;
 import android.widget.FrameLayout;
 
 public class MainActivity extends AppCompatActivity {
-    private Camera mCamera;
     private CameraPreview mPreview;
 
 
@@ -18,36 +17,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mCamera = getCameraInstance();
-        mPreview  = new CameraPreview(this, mCamera);
+        mPreview  = new CameraPreview(this);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_frame);
         preview.addView(mPreview);
     }
-
-    /** Check if this device has a camera */
-    private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-            Log.d("Success: ", "The device has a camera");
-            return true;
-        } else {
-            // no camera on this device
-            Log.d("Error: ", "The device doesn't has a camera");
-            return false;
-        }
-    }
-
-    /** A safe way to get an instance of the Camera object. */
-    public static Camera getCameraInstance(){
-        Camera c = null;
-
-        try {
-            c = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT); // attempt to get a Camera instance
-        }
-        catch (Exception e){
-            // Camera is not available (in use or does not exist)
-            Log.d("Error:", "The camera couldn't be opened");
-        }
-        return c; // returns null if camera is unavailable
-    }
-
 }

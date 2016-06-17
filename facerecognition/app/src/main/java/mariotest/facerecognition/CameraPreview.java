@@ -1,6 +1,7 @@
 package mariotest.facerecognition;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -15,9 +16,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private SurfaceHolder mHolder;
     private Camera mCamera;
 
-    public CameraPreview(Context context, Camera camera) {
+    public CameraPreview(Context context) {
         super(context);
-        mCamera = camera;
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
         mHolder = getHolder();
@@ -30,10 +30,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, now tell the camera where to draw the preview.
         try {
-            mCamera.setDisplayOrientation(90);
+            mCamera = getCameraInstance();
             mCamera.setPreviewDisplay(holder);
-            mCamera.startPreview();
-            startFaceDetection();
         } catch (IOException e) {
             Log.d(VIEW_LOG_TAG, "Error setting camera preview: " + e.getMessage());
             mCamera.release();
@@ -50,20 +48,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             // preview surface does not exist
             return;
         }
-
-        // stop preview before making changes
-        try {
-            mCamera.stopPreview();
-        } catch (Exception e){
-            // ignore: tried to stop a non-existent preview
-        }
-
         // set preview size and make any resize, rotate or
         // reformatting changes here
 
         // start preview with new settings
         try {
+            mCamera.setDisplayOrientation(90);
             mCamera.setPreviewDisplay(mHolder);
+            mCamera.setFaceDetectionListener(new MyFaceDetectionListener());
             mCamera.startPreview();
             startFaceDetection();
         } catch (Exception e){
@@ -89,14 +81,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // start face detection only *after* preview has started
         if (params.getMaxNumDetectedFaces() > 0){
             Log.d("Something", "Detected");
+            mCamera.startFaceDetection();
             // camera supports face detection, so can start it:
-            mCamera.setFaceDetectionListener(new MyFaceDetectionListener());
         } else {
             Log.d("Nothing","detected");
         }
     }
 
-    public class MyFaceDetectionListener implements Camera.FaceDetectionListener {
+     class MyFaceDetectionListener implements Camera.FaceDetectionListener {
 
         @Override
         public void onFaceDetection(Face[] faces, Camera camera) {
@@ -108,6 +100,33 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 Log.d("nada","nada");
             }
         }
+    }
+
+
+    /** Check if this device has a camera */
+    private boolean checkCameraHardware(Context context) {
+        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+            Log.d("Success: ", "The device has a camera");
+            return true;
+        } else {
+            // no camera on this device
+            Log.d("Error: ", "The device doesn't has a camera");
+            return false;
+        }
+    }
+
+    /** A safe way to get an instance of the Camera object. */
+    public static Camera getCameraInstance(){
+        Camera c = null;
+
+        try {
+            c = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT); // attempt to get a Camera instance
+        }
+        catch (Exception e){
+            // Camera is not available (in use or does not exist)
+            Log.d("Error:", "The camera couldn't be opened");
+        }
+        return c; // returns null if camera is unavailable
     }
 
 }
