@@ -137,18 +137,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
 
-    public void takePicture(View view) {
+    public void takePicture() {
         //todo taking a picture to save eyes distance and mouse distance
         //values on the DB
-
-        Button captureButton = (Button) findViewById(R.id.capture_button);
-        captureButton.setOnClickListener(
-                new View.OnClickListener() {
-                 public void onClick(View view) {
-                     mCamera.takePicture(null, null, mPicture);
-                 }
-                }
-        );
         Log.d("button clicked","True");
     }
 
@@ -156,23 +147,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
-
-            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            if (pictureFile == null){
-                Log.d(TAG, "Error creating media file, check storage permissions: " +
-                        e.getMessage());
-                return;
-            }
-
-            try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                fos.write(data);
-                fos.close();
-            } catch (FileNotFoundException e) {
-                Log.d(TAG, "File not found: " + e.getMessage());
-            } catch (IOException e) {
-                Log.d(TAG, "Error accessing file: " + e.getMessage());
-            }
+        //todo implements takpicture method from Camera object
         }
     };
 }
