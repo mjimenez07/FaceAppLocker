@@ -19,11 +19,4 @@ public class MainActivity extends AppCompatActivity {
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_frame);
         preview.addView(mPreview);
     }
-
-
-    public void takePicture(View view) {
-        //todo taking a picture to save eyes distance and mouse distance
-        //values on the DB
-        Log.d("button clicked","True");
-    }
 }

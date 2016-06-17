@@ -7,6 +7,12 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.hardware.Camera.Face;
+import android.view.View;
+import android.widget.Button;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -130,4 +136,43 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         return c; // returns null if camera is unavailable
     }
 
+
+    public void takePicture(View view) {
+        //todo taking a picture to save eyes distance and mouse distance
+        //values on the DB
+
+        Button captureButton = (Button) findViewById(R.id.capture_button);
+        captureButton.setOnClickListener(
+                new View.OnClickListener() {
+                 public void onClick(View view) {
+                     mCamera.takePicture(null, null, mPicture);
+                 }
+                }
+        );
+        Log.d("button clicked","True");
+    }
+
+    private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+
+            File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+            if (pictureFile == null){
+                Log.d(TAG, "Error creating media file, check storage permissions: " +
+                        e.getMessage());
+                return;
+            }
+
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                fos.write(data);
+                fos.close();
+            } catch (FileNotFoundException e) {
+                Log.d(TAG, "File not found: " + e.getMessage());
+            } catch (IOException e) {
+                Log.d(TAG, "Error accessing file: " + e.getMessage());
+            }
+        }
+    };
 }
