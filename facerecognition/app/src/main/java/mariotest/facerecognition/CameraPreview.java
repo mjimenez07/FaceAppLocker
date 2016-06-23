@@ -1,20 +1,12 @@
 package mariotest.facerecognition;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.hardware.Camera;
-import android.net.Uri;
-import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.hardware.Camera.Face;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created by User on 6/13/2016.
@@ -89,10 +81,10 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // start face detection only *after* preview has started
         if (params.getMaxNumDetectedFaces() > 0){
             Log.d("Something", "Detected");
-            mCamera.startFaceDetection();
+//            mCamera.startFaceDetection();
             // camera supports face detection, so can start it:
         } else {
-            Log.d("Nothing","detected");
+            Log.d("Nothing", "detected");
         }
     }
 

@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
     private CameraPreview mPreview;
     private Camera mCamera;
@@ -43,15 +45,20 @@ public class MainActivity extends AppCompatActivity {
 
     /** A safe way to get an instance of the Camera object. */
     public static Camera getCameraInstance(){
-        Camera c = null;
+        Camera camera = null;
 
         try {
-            c = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT); // attempt to get a Camera instance
+            camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT); // attempt to get a Camera instance
         }
         catch (Exception e){
             // Camera is not available (in use or does not exist)
             Log.d("Error:", "The camera couldn't be opened");
         }
-        return c; // returns null if camera is unavailable
+        return camera; // returns null if camera is unavailable
+    }
+
+    public void onClick(View view) {
+        mCamera.takePicture(null, null,
+                new PictureHandler(getApplicationContext()));
     }
 }

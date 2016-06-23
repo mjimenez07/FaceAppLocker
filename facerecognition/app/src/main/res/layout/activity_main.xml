@@ -22,6 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Press me"
-        android:onClick="captureButton"
+        android:onClick="onClick"
         />
 </LinearLayout>
