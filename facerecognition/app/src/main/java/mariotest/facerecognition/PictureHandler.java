@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -45,11 +46,16 @@ public class PictureHandler implements PictureCallback {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddhhmmss");
         String date = dateFormat.format(new Date());
         String photoFile = "Picture_" + date + ".jpg";
-        Bitmap image = BitmapFactory.decodeByteArray(data,0, data.length);
+        BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
+        bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+        Bitmap image = BitmapFactory.decodeByteArray(data, 0, data.length,bitmapFatoryOptions );
         Matrix matrix = new Matrix();
         //180 degrees
         matrix.postRotate(180);
-        image = Bitmap.createBitmap(image, 0, 0, image.getWidth(), image.getHeight(),matrix, false);
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        //image = Bitmap.createBitmap(image, 0, 0, width, height, matrix, false);
 
         String filename = pictureFileDir.getPath() + File.separator + photoFile;
 
@@ -59,12 +65,23 @@ public class PictureHandler implements PictureCallback {
         int imageHeight = image.getHeight();
         int imageWidth = image.getWidth();
 
-        FaceDetector faceDetector = new FaceDetector(imageHeight, imageWidth, 1);
-        FaceDetector.Face[]  faces = new  FaceDetector.Face[1];
-        int findFaces = faceDetector.findFaces(image, faces);
-        Log.d("face in the image", faces.toString());
+        if (imageWidth % 2 == 1) {
+            Log.d("FaceDetector", imageWidth + " f " + "neka");
+            imageWidth -= 1;
+        }
+        Log.d("FaceDetector", imageWidth + " t " + "neka");
 
-        Log.i("FaceDetector", faces[0].eyesDistance()+ "neka");
+        FaceDetector faceDetector = new FaceDetector(imageWidth, imageHeight, 1);
+        FaceDetector.Face[] faces = new FaceDetector.Face[1];
+        int findFaces = faceDetector.findFaces(image, faces);
+        Log.d("face in the image", findFaces + "");
+
+        if (faces[0] != null) {
+            Log.i("FaceDetector", "Eyes Distance: " + faces[0].eyesDistance() + "neka");
+        } else {
+            Log.i("FaceDetector", "null");
+        }
+
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
             fos.write(outputStream.toByteArray());
