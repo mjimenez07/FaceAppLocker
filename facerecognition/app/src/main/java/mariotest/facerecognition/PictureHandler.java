@@ -46,45 +46,15 @@ public class PictureHandler implements PictureCallback {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyymmddhhmmss");
         String date = dateFormat.format(new Date());
         String photoFile = "Picture_" + date + ".jpg";
-        BitmapFactory.Options bitmapFatoryOptions = new BitmapFactory.Options();
-        bitmapFatoryOptions.inPreferredConfig = Bitmap.Config.RGB_565;
-        Bitmap image = BitmapFactory.decodeByteArray(data, 0, data.length,bitmapFatoryOptions );
-        Matrix matrix = new Matrix();
-        //180 degrees
-        matrix.postRotate(180);
-        int width = image.getWidth();
-        int height = image.getHeight();
-
-        //image = Bitmap.createBitmap(image, 0, 0, width, height, matrix, false);
 
         String filename = pictureFileDir.getPath() + File.separator + photoFile;
+        Log.v("Neka to see", filename);
 
         File pictureFile = new File(filename);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-        int imageHeight = image.getHeight();
-        int imageWidth = image.getWidth();
-
-        if (imageWidth % 2 == 1) {
-            Log.d("FaceDetector", imageWidth + " f " + "neka");
-            imageWidth -= 1;
-        }
-        Log.d("FaceDetector", imageWidth + " t " + "neka");
-
-        FaceDetector faceDetector = new FaceDetector(imageWidth, imageHeight, 1);
-        FaceDetector.Face[] faces = new FaceDetector.Face[1];
-        int findFaces = faceDetector.findFaces(image, faces);
-        Log.d("face in the image", findFaces + "");
-
-        if (faces[0] != null) {
-            Log.i("FaceDetector", "Eyes Distance: " + faces[0].eyesDistance() + "neka");
-        } else {
-            Log.i("FaceDetector", "null");
-        }
 
         try {
             FileOutputStream fos = new FileOutputStream(pictureFile);
-            fos.write(outputStream.toByteArray());
+            fos.write(data);
             fos.close();
             Toast.makeText(context, "New Image saved:" + photoFile,
                     Toast.LENGTH_LONG).show();
@@ -94,6 +64,18 @@ public class PictureHandler implements PictureCallback {
             Toast.makeText(context, "Image could not be saved.",
                     Toast.LENGTH_LONG).show();
         }
+
+        BitmapFactory.Options bitMapFactoryOpts = new BitmapFactory.Options();
+        bitMapFactoryOpts.inPreferredConfig = Bitmap.Config.RGB_565;
+        Bitmap image = BitmapFactory.decodeFile(filename, bitMapFactoryOpts);
+        int height = image.getHeight();
+        int width = image.getWidth();
+        FaceDetector faceDetector = new FaceDetector(width, height, 1);
+        FaceDetector.Face[] faceInImage = new FaceDetector.Face[1];
+        int findFaces = faceDetector.findFaces(image, faceInImage);
+        Log.v("width", width + "");
+        Log.v("height", height + "");
+        Log.v("faces found", findFaces + "");
 
     }
 

@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT); // attempt to get a Camera instance
+//            camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
         }
         catch (Exception e){
             // Camera is not available (in use or does not exist)
