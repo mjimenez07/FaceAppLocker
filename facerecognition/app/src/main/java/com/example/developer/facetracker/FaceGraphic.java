@@ -3,9 +3,11 @@ package com.example.developer.facetracker;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.Landmark;
 
 /**
  * Created by Mario on 9/13/2016.
@@ -75,6 +77,9 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
     @Override
     public void draw(Canvas canvas) {
         Face face = mFace;
+        double viewWidth = canvas.getWidth();
+        double viewHeight = canvas.getHeight();
+        double scale = Math.min(viewWidth / face.getWidth(), viewHeight / face.getHeight());
         if (face == null) {
             return;
         }
@@ -82,11 +87,13 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         // Draws a circle at the position of the detected face, with the face's track id below.
         float x = translateX(face.getPosition().x + face.getWidth() / 2);
         float y = translateY(face.getPosition().y + face.getHeight() / 2);
-        canvas.drawCircle(x, y, FACE_POSITION_RADIUS, mFacePositionPaint);
-        canvas.drawText("id: " + mFaceId, x + ID_X_OFFSET, y + ID_Y_OFFSET, mIdPaint);
-        canvas.drawText("happiness: " + String.format("%.2f", face.getIsSmilingProbability()), x - ID_X_OFFSET, y - ID_Y_OFFSET, mIdPaint);
-        canvas.drawText("right eye: " + String.format("%.2f", face.getIsRightEyeOpenProbability()), x + ID_X_OFFSET * 2, y + ID_Y_OFFSET * 2, mIdPaint);
-        canvas.drawText("left eye: " + String.format("%.2f", face.getIsLeftEyeOpenProbability()), x - ID_X_OFFSET*2, y - ID_Y_OFFSET*2, mIdPaint);
+        for (Landmark landmark : face.getLandmarks() ) {
+            Log.v("landmarks here","" + landmark.getPosition() + "");
+            int cx = (int) (landmark.getPosition().x * scale);
+            int cy = (int) (landmark.getPosition().y * scale);
+            canvas.drawCircle(cx, cy, 10, mBoxPaint );
+
+        }
 
         // Draws a bounding box around the face.
         float xOffset = scaleX(face.getWidth() / 2.0f);
