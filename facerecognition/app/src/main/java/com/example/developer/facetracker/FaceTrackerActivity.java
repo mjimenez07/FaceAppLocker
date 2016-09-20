@@ -86,15 +86,16 @@ public class FaceTrackerActivity extends AppCompatActivity {
 
         Context context = getApplicationContext();
         FaceDetector detector = new FaceDetector.Builder(context)
+                .setTrackingEnabled(true)
                 .setProminentFaceOnly(true)
+                .setMode(FaceDetector.ACCURATE_MODE)
                 .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                .setTrackingEnabled(false)
                 .build();
 
         detector.setProcessor(
                 //TODO verify how to implement this check this documentation
                 // https://developers.google.com/android/reference/com/google/android/gms/vision/face/LargestFaceFocusingProcessor
-                
+
 //                new LargestFaceFocusingProcessor.Builder<>(new GraphicFaceTrackerFactory())
                 new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
                 .build());

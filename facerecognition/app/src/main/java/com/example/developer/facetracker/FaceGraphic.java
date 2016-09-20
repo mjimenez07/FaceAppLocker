@@ -87,13 +87,6 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         // Draws a circle at the position of the detected face, with the face's track id below.
         float x = translateX(face.getPosition().x + face.getWidth() / 2);
         float y = translateY(face.getPosition().y + face.getHeight() / 2);
-        for (Landmark landmark : face.getLandmarks() ) {
-            Log.v("landmarks here","" + landmark.getPosition() + "");
-            int cx = (int) (landmark.getPosition().x * scale);
-            int cy = (int) (landmark.getPosition().y * scale);
-            canvas.drawCircle(cx, cy, 10, mBoxPaint );
-
-        }
 
         // Draws a bounding box around the face.
         float xOffset = scaleX(face.getWidth() / 2.0f);
@@ -103,6 +96,17 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         float right = x + xOffset;
         float bottom = y + yOffset;
         canvas.drawRect(left, top, right, bottom, mBoxPaint);
+        for (Landmark landmark: face.getLandmarks()) {
+            switch (landmark.getType()) {
+                case Landmark.LEFT_EYE:
+                    Log.v("Left Eye position", "" +   landmark.getPosition());
+                    canvas.drawCircle(landmark.getPosition().x , landmark.getPosition().y, 10, mBoxPaint );
+                case Landmark.RIGHT_EYE:
+                    Log.v("Right Eye position", "" +  landmark.getPosition());
+                case Landmark.NOSE_BASE:
+                    Log.v("Nose Base position", "" +  landmark.getPosition());
+            }
+        }
     }
 
 }
