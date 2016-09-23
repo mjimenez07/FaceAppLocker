@@ -99,7 +99,7 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         for (Landmark landmark: face.getLandmarks()) {
             switch (landmark.getType()) {
                 case Landmark.LEFT_EYE:
-                    Log.v("Left Eye position neka", "" +   landmark.getPosition());
+                    Log.v("Left Eye position", "" +   landmark.getPosition());
                     break;
                 case Landmark.RIGHT_EYE:
                     Log.v("Right Eye position", "" +  landmark.getPosition());
