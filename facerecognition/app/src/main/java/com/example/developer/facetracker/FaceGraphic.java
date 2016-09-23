@@ -23,10 +23,8 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
             Color.BLUE,
             Color.CYAN,
             Color.GREEN,
-            Color.MAGENTA,
             Color.RED,
             Color.WHITE,
-            Color.YELLOW
     };
     private static int mCurrentColorIndex = 0;
 
@@ -79,7 +77,6 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         Face face = mFace;
         double viewWidth = canvas.getWidth();
         double viewHeight = canvas.getHeight();
-        double scale = Math.min(viewWidth / face.getWidth(), viewHeight / face.getHeight());
         if (face == null) {
             return;
         }
@@ -96,16 +93,19 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         float right = x + xOffset;
         float bottom = y + yOffset;
         canvas.drawRect(left, top, right, bottom, mBoxPaint);
+
+        //Todo calculate the distance of each point with this formula link http://stackoverflow.com/questions/20916953/get-distance-between-two-points-in-canvas
+        
         for (Landmark landmark: face.getLandmarks()) {
             switch (landmark.getType()) {
                 case Landmark.LEFT_EYE:
-                    Log.v("Left Eye position", "" +   landmark.getPosition());
+                    Log.v("Left Eye position", " x position: " +   landmark.getPosition().x + "y position: "+   landmark.getPosition().y);
                     break;
                 case Landmark.RIGHT_EYE:
-                    Log.v("Right Eye position", "" +  landmark.getPosition());
+                    Log.v("Right Eye position", " x position: " +   landmark.getPosition().x + "y position: "+   landmark.getPosition().y);
                     break;
-                case Landmark.NOSE_BASE:
-                    Log.v("Nose Base position", "" +  landmark.getPosition());
+                case Landmark.BOTTOM_MOUTH:
+                    Log.v("Bottom mouth position", " x position: " +   landmark.getPosition().x + "y position: "+   landmark.getPosition().y);
                     break;
             }
         }
