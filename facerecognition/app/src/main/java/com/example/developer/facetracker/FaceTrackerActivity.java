@@ -48,6 +48,7 @@ public class FaceTrackerActivity extends AppCompatActivity {
 
 
         //Check for the camera permission before accessing the camera.
+        // if the  permission is not granted yet, request permission.
         int requestCameraPermission = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (requestCameraPermission == PackageManager.PERMISSION_GRANTED) {
             createCameraSource();
@@ -243,7 +244,6 @@ public class FaceTrackerActivity extends AppCompatActivity {
     private class GraphicFaceTracker extends Tracker<Face> {
         private GraphicOverlay mOverlay;
         private FaceGraphic mFaceGraphic;
-
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
             mFaceGraphic = new FaceGraphic(overlay);
