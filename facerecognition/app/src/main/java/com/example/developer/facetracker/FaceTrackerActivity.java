@@ -7,6 +7,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -23,9 +25,12 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.android.gms.vision.face.Landmark;
 
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class FaceTrackerActivity extends AppCompatActivity {
@@ -65,7 +70,7 @@ public class FaceTrackerActivity extends AppCompatActivity {
         final String[] permission = new String[]{Manifest.permission.CAMERA};
 
         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(this,permission,RC_HANDLE_CAMERA_PERM);
+            ActivityCompat.requestPermissions(this, permission, RC_HANDLE_CAMERA_PERM);
             return;
         }
         final Activity thisActivity = this;
@@ -77,9 +82,9 @@ public class FaceTrackerActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(thisActivity, permission, RC_HANDLE_CAMERA_PERM);
             }
         };
-        Snackbar.make(mGraphicOverlay,"Acess to the camera is needed for face tracking",
+        Snackbar.make(mGraphicOverlay, "Acess to the camera is needed for face tracking",
                 Snackbar.LENGTH_INDEFINITE)
-                .setAction("OK",listener)
+                .setAction("OK", listener)
                 .show();
     }
 
@@ -100,10 +105,10 @@ public class FaceTrackerActivity extends AppCompatActivity {
 
 //                new LargestFaceFocusingProcessor.Builder<>(new GraphicFaceTrackerFactory())
                 new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
-                .build());
+                        .build());
 
         if (!detector.isOperational()) {
-            Log.v(TAG,"Face detector dependencies are not yet available");
+            Log.v(TAG, "Face detector dependencies are not yet available");
         }
 
         mCameraSource = new CameraSource.Builder(context, detector)
@@ -244,6 +249,12 @@ public class FaceTrackerActivity extends AppCompatActivity {
     private class GraphicFaceTracker extends Tracker<Face> {
         private GraphicOverlay mOverlay;
         private FaceGraphic mFaceGraphic;
+
+        // Record the previously seen proportions of the landmark locations relative to the bounding box
+        // of the face.  These proportions can be used to approximate where the landmarks are within the
+        // face bounding box if the eye landmark is missing in a future update.
+        private Map<Integer, PointF> mPreviousProportions = new HashMap<>();
+
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
             mFaceGraphic = new FaceGraphic(overlay);
@@ -263,6 +274,11 @@ public class FaceTrackerActivity extends AppCompatActivity {
         @Override
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
             mOverlay.add(mFaceGraphic);
+
+            updatePreviousProportions(face);
+            PointF leftEyePosition = getLandmarkPosition(face, Landmark.LEFT_EYE);
+            PointF rightEyePosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
+
             mFaceGraphic.updateFace(face);
         }
 
@@ -284,5 +300,56 @@ public class FaceTrackerActivity extends AppCompatActivity {
         public void onDone() {
             mOverlay.remove(mFaceGraphic);
         }
+
+
+        private void updatePreviousProportions(Face face) {
+            for (Landmark landmark : face.getLandmarks()) {
+                PointF position = landmark.getPosition();
+                float xProp = (position.x - face.getPosition().x) / face.getWidth();
+                float yProp = (position.y - face.getPosition().y) / face.getHeight();
+                mPreviousProportions.put(landmark.getType(), new PointF(xProp, yProp));
+            }
+        }
+
+        /**
+         * function getLandmarkPosition
+         *
+         * @param face       face objects that we will use to take the landmarks
+         * @param landMarkID int value of the landmark needed
+         *                   return landmark position
+         **/
+        private PointF getLandmarkPosition(Face face, int landMarkID) {
+            for (Landmark landmark : face.getLandmarks()) {
+                if (landmark.getType() == landMarkID) {
+                    return landmark.getPosition();
+                }
+            }
+
+            PointF prop = mPreviousProportions.get(landMarkID);
+            if (prop == null) {
+                return null;
+            }
+
+            float x = face.getPosition().x + (prop.x * face.getWidth());
+            float y = face.getPosition().y + (prop.y * face.getHeight());
+            return new PointF(x, y);
+        }
+
+
+        private void calculateLandMarkPositionDistance() {
+            //Todo calculate the distance of each point with this formula link http://stackoverflow.com/questions/20916953/get-distance-between-two-points-in-canvas
+
+            double leftEyeXposition = 0;
+            double leftEyeYposition = 0;
+            double rightEyeXposition = 0;
+            double rightEyeYposition = 0;
+            double bottomMouthXposition = 0;
+            double bottomMouthYposition = 0;
+            double distanceLeftEyeToRighteye = 0;
+            double distanceLeftEyeToBottomMouse = 0;
+            double distanceRightEyeToBottomMouse = 0;
+
+        }
     }
 }
+

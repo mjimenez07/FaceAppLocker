@@ -3,6 +3,7 @@ package com.example.developer.facetracker;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PointF;
 import android.util.Log;
 
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
@@ -77,7 +78,6 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         if (face == null) {
             return;
         }
-        getFaceLandmarksInfo(face);
         // Draws a circle at the position of the detected face, with the face's track id below.
         float x = translateX(face.getPosition().x + face.getWidth() / 2);
         float y = translateY(face.getPosition().y + face.getHeight() / 2);
@@ -92,56 +92,4 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         canvas.drawRect(left, top, right, bottom, mBoxPaint);
 
     }
-
-      /**
-       * function getFaceLandmarksInfo
-       * @param face face objects that we will use to take the landmarks
-       *that are at the moment left eye, right eye and mouse position to save the distance between them
-       **/
-
-    public void getFaceLandmarksInfo(Face face) {
-
-        double leftEyeXposition = 0;
-        double leftEyeYposition = 0;
-        double rightEyeXposition = 0;
-        double rightEyeYposition = 0;
-        double bottomMouthXposition = 0;
-        double bottomMouthYposition = 0;
-        double distanceLeftEyeToRighteye = 0;
-        double distanceLeftEyeToBottomMouse = 0;
-        double distanceRightEyeToBottomMouse = 0;
-        boolean neka = false;
-
-        //Todo calculate the distance of each point with this formula link http://stackoverflow.com/questions/20916953/get-distance-between-two-points-in-canvas
-        while (!neka) {
-            for (Landmark landmark: face.getLandmarks()) {
-                switch (landmark.getType()) {
-                    case Landmark.LEFT_EYE:
-                        Log.v("Left Eye position", " x position: " +   landmark.getPosition().x + " y position: "+   landmark.getPosition().y);
-                        leftEyeXposition = (double) landmark.getPosition().x;
-                        leftEyeYposition = (double) landmark.getPosition().y;
-                        break;
-                    case Landmark.RIGHT_EYE:
-                        Log.v("Right Eye position", " x position: " +   landmark.getPosition().x + " y position: "+   landmark.getPosition().y);
-                        rightEyeXposition = (double) landmark.getPosition().x;
-                        rightEyeYposition = (double) landmark.getPosition().y;
-                        break;
-                    case Landmark.BOTTOM_MOUTH:
-                        Log.v("Bottom mouth position", " x position: " +   landmark.getPosition().x + " y position: "+   landmark.getPosition().y);
-                        bottomMouthXposition = (double) landmark.getPosition().x;
-                        bottomMouthYposition = (double) landmark.getPosition().y;
-                        break;
-                }
-                if ((leftEyeXposition != 0) && (leftEyeYposition != 0)) {
-                    distanceLeftEyeToRighteye = Math.sqrt( ( ( leftEyeXposition -  rightEyeXposition )  * ( leftEyeXposition -  rightEyeXposition ) )
-                            + ( ( leftEyeYposition - rightEyeYposition ) * ( leftEyeYposition - rightEyeYposition ) )  );
-                    if ( distanceLeftEyeToRighteye != 0 ) {
-                        Log.v("Eyes distance:", "" + distanceLeftEyeToRighteye);
-                        neka = true;
-                    }
-                }
-            }
-        }
-    }
-
 }
