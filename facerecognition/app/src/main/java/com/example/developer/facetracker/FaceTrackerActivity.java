@@ -278,6 +278,10 @@ public class FaceTrackerActivity extends AppCompatActivity {
             updatePreviousProportions(face);
             PointF leftEyePosition = getLandmarkPosition(face, Landmark.LEFT_EYE);
             PointF rightEyePosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
+            PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
+
+
+            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
 
             mFaceGraphic.updateFace(face);
         }
@@ -314,9 +318,9 @@ public class FaceTrackerActivity extends AppCompatActivity {
         /**
          * function getLandmarkPosition
          *
-         * @param face       face objects that we will use to take the landmarks
+         * @param face face objects that we will use to take the landmarks
          * @param landMarkID int value of the landmark needed
-         *                   return landmark position
+         *  return landmark position
          **/
         private PointF getLandmarkPosition(Face face, int landMarkID) {
             for (Landmark landmark : face.getLandmarks()) {
@@ -336,18 +340,21 @@ public class FaceTrackerActivity extends AppCompatActivity {
         }
 
 
-        private void calculateLandMarkPositionDistance() {
+        private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
             //Todo calculate the distance of each point with this formula link http://stackoverflow.com/questions/20916953/get-distance-between-two-points-in-canvas
 
-            double leftEyeXposition = 0;
-            double leftEyeYposition = 0;
-            double rightEyeXposition = 0;
-            double rightEyeYposition = 0;
-            double bottomMouthXposition = 0;
-            double bottomMouthYposition = 0;
+            double leftEyeXposition = (double) leftEyePosition.x;
+            double leftEyeYposition = (double) leftEyePosition.y;
+            double rightEyeXposition = (double) rightEyePosition.x;
+            double rightEyeYposition = (double) rightEyePosition.y;
+            double bottomMouthXposition = (double) bottomMouthPosition.x;
+            double bottomMouthYposition = (double) bottomMouthPosition.y;
             double distanceLeftEyeToRighteye = 0;
             double distanceLeftEyeToBottomMouse = 0;
             double distanceRightEyeToBottomMouse = 0;
+
+            Log.v("Left Eye coordinates: ", "X position: " + leftEyeXposition + " Y position: " + leftEyeYposition);
+            Log.v("Right Eye coordinates: ", "X position: " + rightEyeXposition + " Y position: " + rightEyeYposition);
 
         }
     }
