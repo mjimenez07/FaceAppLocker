@@ -10,6 +10,9 @@ import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.Landmark;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Mario on 9/13/2016.
  */
@@ -19,6 +22,14 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
     private static final float ID_Y_OFFSET = 50.0f;
     private static final float ID_X_OFFSET = -50.0f;
     private static final float BOX_STROKE_WIDTH = 5.0f;
+
+    //Force!
+    public float left;
+    public float right;
+    public float top;
+    public float bottom;
+
+    public Map<String, Float> canvasDimensions = new HashMap<>();
 
     private static final int COLOR_CHOICES[] = {
             Color.BLUE,
@@ -74,22 +85,32 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
      */
     @Override
     public void draw(Canvas canvas) {
+
         Face face = mFace;
         if (face == null) {
             return;
         }
         // Draws a circle at the position of the detected face, with the face's track id below.
         float x = translateX(face.getPosition().x + face.getWidth() / 2);
-        float y = translateY(face.getPosition().y + face.getHeight() / 2);
+        float  y = translateY(face.getPosition().y + face.getHeight() / 2);
 
         // Draws a bounding box around the face.
         float xOffset = scaleX(face.getWidth() / 2.0f);
         float yOffset = scaleY(face.getHeight() / 2.0f);
-        float left = x - xOffset;
-        float top = y - yOffset;
-        float right = x + xOffset;
-        float bottom = y + yOffset;
+        left = x - xOffset;
+        top = y - yOffset;
+        right = x + xOffset;
+        bottom = y + yOffset;
         canvas.drawRect(left, top, right, bottom, mBoxPaint);
 
+    }
+
+    public Map neka() {
+        canvasDimensions.put("left", left);
+        canvasDimensions.put("top", top);
+        canvasDimensions.put("right", right);
+        canvasDimensions.put("bottom", bottom);
+
+        return canvasDimensions;
     }
 }

@@ -281,9 +281,9 @@ public class FaceTrackerActivity extends AppCompatActivity {
             PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
 
 
+            mFaceGraphic.updateFace(face);
             landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
 
-            mFaceGraphic.updateFace(face);
         }
 
         /**
@@ -343,18 +343,28 @@ public class FaceTrackerActivity extends AppCompatActivity {
         private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
             //Todo calculate the distance of each point with this formula link http://stackoverflow.com/questions/20916953/get-distance-between-two-points-in-canvas
 
-            double leftEyeXposition = (double) leftEyePosition.x;
-            double leftEyeYposition = (double) leftEyePosition.y;
-            double rightEyeXposition = (double) rightEyePosition.x;
-            double rightEyeYposition = (double) rightEyePosition.y;
+            double L = Math.abs(mFaceGraphic.left - mFaceGraphic.right);
+            double W = Math.abs(mFaceGraphic.left - mFaceGraphic.bottom);
+            double Area = L * W;
+            double leftEyeXposition = (double) leftEyePosition.x * Area;
+            double leftEyeYposition = (double) leftEyePosition.y * Area;
+            double rightEyeXposition = (double) rightEyePosition.x * Area;
+            double rightEyeYposition = (double) rightEyePosition.y * Area;
             double bottomMouthXposition = (double) bottomMouthPosition.x;
             double bottomMouthYposition = (double) bottomMouthPosition.y;
-            double distanceLeftEyeToRighteye = 0;
+            int distanceLeftEyeToRighteye = (int) Math.sqrt( Math.pow((leftEyeXposition - rightEyeXposition),2) + Math.pow((leftEyeYposition - rightEyeYposition),2));
             double distanceLeftEyeToBottomMouse = 0;
             double distanceRightEyeToBottomMouse = 0;
+            Log.v("Distance", distanceLeftEyeToRighteye + "");
+//            Log.v("Rectangle area: ", "Area: " + L * W);
+//            Log.v("Left Eye coordinates: ", "X position: " + leftEyeXposition * Area + " Y position: " + leftEyeYposition * Area);
+//            Log.v("Right Eye coordinates: ", "X position: " + rightEyeXposition  * Area + " Y position: " + rightEyeYposition * Area );
 
-            Log.v("Left Eye coordinates: ", "X position: " + leftEyeXposition + " Y position: " + leftEyeYposition);
-            Log.v("Right Eye coordinates: ", "X position: " + rightEyeXposition + " Y position: " + rightEyeYposition);
+
+
+            //Log.v("Rectangle coordinates: ", "L: " + Math.abs(mFaceGraphic.left - mFaceGraphic.right));
+            //Log.v("Rectangle coordinates: ", "W: " + Math.abs(mFaceGraphic.left - mFaceGraphic.bottom));
+
 
         }
     }
