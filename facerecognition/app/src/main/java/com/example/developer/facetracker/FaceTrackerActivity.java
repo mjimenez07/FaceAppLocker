@@ -343,13 +343,13 @@ public class FaceTrackerActivity extends AppCompatActivity {
         private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
             //Todo calculate the distance of each point with this formula link http://stackoverflow.com/questions/20916953/get-distance-between-two-points-in-canvas
 
-            double L = Math.abs(mFaceGraphic.left - mFaceGraphic.right);
-            double W = Math.abs(mFaceGraphic.left - mFaceGraphic.bottom);
-            double Area = L * W;
-            double leftEyeXposition = (double) leftEyePosition.x * Area;
-            double leftEyeYposition = (double) leftEyePosition.y * Area;
-            double rightEyeXposition = (double) rightEyePosition.x * Area;
-            double rightEyeYposition = (double) rightEyePosition.y * Area;
+//            double L = Math.abs(mFaceGraphic.left - mFaceGraphic.right);
+//            double W = Math.abs(mFaceGraphic.left - mFaceGraphic.bottom);
+//            double Area = L * W;
+            double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
+            double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
+            double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
+            double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
             double bottomMouthXposition = (double) bottomMouthPosition.x;
             double bottomMouthYposition = (double) bottomMouthPosition.y;
             int distanceLeftEyeToRighteye = (int) Math.sqrt( Math.pow((leftEyeXposition - rightEyeXposition),2) + Math.pow((leftEyeYposition - rightEyeYposition),2));

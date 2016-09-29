@@ -28,6 +28,13 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
     public float right;
     public float top;
     public float bottom;
+    public float xOffset;
+    public float yOffset;
+    public double canvasHeight;
+    public double canvasWidth;
+    public double faceWidth;
+    public double faceHeight;
+    public double scale;
 
     public Map<String, Float> canvasDimensions = new HashMap<>();
 
@@ -95,12 +102,17 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         float  y = translateY(face.getPosition().y + face.getHeight() / 2);
 
         // Draws a bounding box around the face.
-        float xOffset = scaleX(face.getWidth() / 2.0f);
-        float yOffset = scaleY(face.getHeight() / 2.0f);
+        xOffset = scaleX(face.getWidth() / 2.0f);
+        yOffset = scaleY(face.getHeight() / 2.0f);
         left = x - xOffset;
         top = y - yOffset;
         right = x + xOffset;
         bottom = y + yOffset;
+        canvasWidth = canvas.getWidth();
+        canvasHeight = canvas.getHeight();
+        faceWidth = face.getWidth();
+        faceHeight = face.getHeight();
+        scale = Math.min(canvasWidth / faceWidth, canvasHeight / faceHeight);
         canvas.drawRect(left, top, right, bottom, mBoxPaint);
 
     }
