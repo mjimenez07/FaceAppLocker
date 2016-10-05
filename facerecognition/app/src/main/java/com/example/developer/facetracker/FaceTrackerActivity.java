@@ -6,9 +6,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,11 +24,13 @@ import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
+import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 
 
 import java.io.IOException;
@@ -90,26 +95,8 @@ public class FaceTrackerActivity extends AppCompatActivity {
 
     // Creates and start the camera.
     private void createCameraSource() {
-
-        Context context = getApplicationContext();
-        FaceDetector detector = new FaceDetector.Builder(context)
-                .setTrackingEnabled(true)
-                .setProminentFaceOnly(true)
-                .setMode(FaceDetector.ACCURATE_MODE)
-                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
-                .build();
-
-        detector.setProcessor(
-                //TODO verify how to implement this check this documentation
-                // https://developers.google.com/android/reference/com/google/android/gms/vision/face/LargestFaceFocusingProcessor
-
-//                new LargestFaceFocusingProcessor.Builder<>(new GraphicFaceTrackerFactory())
-                new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
-                        .build());
-
-        if (!detector.isOperational()) {
-            Log.v(TAG, "Face detector dependencies are not yet available");
-        }
+        Context context =  getApplicationContext();
+        FaceDetector detector = createFaceDetector(context);
 
         mCameraSource = new CameraSource.Builder(context, detector)
                 .setRequestedPreviewSize(640, 480)
@@ -223,150 +210,35 @@ public class FaceTrackerActivity extends AppCompatActivity {
                 Log.e(TAG, "Unable to start camera source.", e);
                 mCameraSource.release();
                 mCameraSource = null;
+
             }
         }
     }
 
     //==============================================================================================
-    // Graphic Face Tracker
+    // Face Detector Builder
     //==============================================================================================
 
-    /**
-     * Factory for creating a face tracker to be associated with a new face.  The multiprocessor
-     * uses this factory to create face trackers as needed -- one for each individual.
+    /** Here we build the face detector instance.
      */
-    private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
-        @Override
-        public Tracker<Face> create(Face face) {
-            return new GraphicFaceTracker(mGraphicOverlay);
+    private FaceDetector createFaceDetector(Context context) {
+
+        FaceDetector detector = new FaceDetector.Builder(context)
+                .setTrackingEnabled(true)
+                .setProminentFaceOnly(true)
+                .setMode(FaceDetector.ACCURATE_MODE)
+                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                .build();
+
+        Detector.Processor<Face> processor;
+        Tracker<Face> tracker = new FaceTracker(mGraphicOverlay);
+        processor = new LargestFaceFocusingProcessor(detector, tracker);
+
+        detector.setProcessor(processor);
+        if (!detector.isOperational()) {
+            Log.v(TAG, "Face detector dependencies are not yet available");
         }
-    }
-
-    /**
-     * Face tracker for each detected individual. This maintains a face graphic within the app's
-     * associated face overlay.
-     */
-    private class GraphicFaceTracker extends Tracker<Face> {
-        private GraphicOverlay mOverlay;
-        private FaceGraphic mFaceGraphic;
-
-        // Record the previously seen proportions of the landmark locations relative to the bounding box
-        // of the face.  These proportions can be used to approximate where the landmarks are within the
-        // face bounding box if the eye landmark is missing in a future update.
-        private Map<Integer, PointF> mPreviousProportions = new HashMap<>();
-
-        GraphicFaceTracker(GraphicOverlay overlay) {
-            mOverlay = overlay;
-            mFaceGraphic = new FaceGraphic(overlay);
-        }
-
-        /**
-         * Start tracking the detected face instance within the face overlay.
-         */
-        @Override
-        public void onNewItem(int faceId, Face item) {
-            mFaceGraphic.setId(faceId);
-        }
-
-        /**
-         * Update the position/characteristics of the face within the overlay.
-         */
-        @Override
-        public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
-            mOverlay.add(mFaceGraphic);
-
-            updatePreviousProportions(face);
-            PointF leftEyePosition = getLandmarkPosition(face, Landmark.LEFT_EYE);
-            PointF rightEyePosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
-            PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
-
-
-            mFaceGraphic.updateFace(face);
-            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
-
-        }
-
-        /**
-         * Hide the graphic when the corresponding face was not detected.  This can happen for
-         * intermediate frames temporarily (e.g., if the face was momentarily blocked from
-         * view).
-         */
-        @Override
-        public void onMissing(FaceDetector.Detections<Face> detectionResults) {
-            mOverlay.remove(mFaceGraphic);
-        }
-
-        /**
-         * Called when the face is assumed to be gone for good. Remove the graphic annotation from
-         * the overlay.
-         */
-        @Override
-        public void onDone() {
-            mOverlay.remove(mFaceGraphic);
-        }
-
-
-        private void updatePreviousProportions(Face face) {
-            for (Landmark landmark : face.getLandmarks()) {
-                PointF position = landmark.getPosition();
-                float xProp = (position.x - face.getPosition().x) / face.getWidth();
-                float yProp = (position.y - face.getPosition().y) / face.getHeight();
-                mPreviousProportions.put(landmark.getType(), new PointF(xProp, yProp));
-            }
-        }
-
-        /**
-         * function getLandmarkPosition
-         *
-         * @param face face objects that we will use to take the landmarks
-         * @param landMarkID int value of the landmark needed
-         *  return landmark position
-         **/
-        private PointF getLandmarkPosition(Face face, int landMarkID) {
-            for (Landmark landmark : face.getLandmarks()) {
-                if (landmark.getType() == landMarkID) {
-                    return landmark.getPosition();
-                }
-            }
-
-            PointF prop = mPreviousProportions.get(landMarkID);
-            if (prop == null) {
-                return null;
-            }
-
-            float x = face.getPosition().x + (prop.x * face.getWidth());
-            float y = face.getPosition().y + (prop.y * face.getHeight());
-            return new PointF(x, y);
-        }
-
-
-        private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
-            //Todo calculate the distance of each point with this formula link http://stackoverflow.com/questions/20916953/get-distance-between-two-points-in-canvas
-
-//            double L = Math.abs(mFaceGraphic.left - mFaceGraphic.right);
-//            double W = Math.abs(mFaceGraphic.left - mFaceGraphic.bottom);
-//            double Area = L * W;
-            double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
-            double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
-            double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
-            double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
-            double bottomMouthXposition = (double) bottomMouthPosition.x;
-            double bottomMouthYposition = (double) bottomMouthPosition.y;
-            int distanceLeftEyeToRighteye = (int) Math.sqrt( Math.pow((leftEyeXposition - rightEyeXposition),2) + Math.pow((leftEyeYposition - rightEyeYposition),2));
-            double distanceLeftEyeToBottomMouse = 0;
-            double distanceRightEyeToBottomMouse = 0;
-            Log.v("Distance", distanceLeftEyeToRighteye + "");
-//            Log.v("Rectangle area: ", "Area: " + L * W);
-//            Log.v("Left Eye coordinates: ", "X position: " + leftEyeXposition * Area + " Y position: " + leftEyeYposition * Area);
-//            Log.v("Right Eye coordinates: ", "X position: " + rightEyeXposition  * Area + " Y position: " + rightEyeYposition * Area );
-
-
-
-            //Log.v("Rectangle coordinates: ", "L: " + Math.abs(mFaceGraphic.left - mFaceGraphic.right));
-            //Log.v("Rectangle coordinates: ", "W: " + Math.abs(mFaceGraphic.left - mFaceGraphic.bottom));
-
-
-        }
+        return detector;
     }
 }
 
