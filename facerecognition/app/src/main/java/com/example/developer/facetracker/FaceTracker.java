@@ -126,9 +126,9 @@ public class FaceTracker extends Tracker<Face> {
 
         //This is a way to calculate the ratio of each distance we divide each distance by the lower distance
         int minValue = Math.min(Math.min(eyesDistance,rightEyeMouseDistance),leftEyeMouseDistance);
-        float eyesRatio = eyesDistance / minValue;
-        float rightEyeMouthRatio = rightEyeMouseDistance  / minValue;
-        float leftEyeMouthRatio = leftEyeMouseDistance / minValue;
+        double eyesRatio = (double) eyesDistance / minValue;
+        double rightEyeMouthRatio = (double) rightEyeMouseDistance  / minValue;
+        double leftEyeMouthRatio = (double) leftEyeMouseDistance / minValue;
 //
 //        //Printing results
         Log.v("Eyes distance: ", eyesDistance + "");
