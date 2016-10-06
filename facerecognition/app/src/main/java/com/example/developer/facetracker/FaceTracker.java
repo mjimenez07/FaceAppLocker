@@ -11,6 +11,8 @@ import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +22,40 @@ import java.util.Map;
 public class FaceTracker extends Tracker<Face> {
     private GraphicOverlay mOverlay;
     private FaceGraphic mFaceGraphic;
+    public double[] distanceRatioArray = new  double[10];
+    public int index = 0;
+
+    class FaceDetailsAvg {
+        public ArrayList<Double> eyesRatios = new ArrayList();
+        public ArrayList<Double> rightEyeMouthRatios = new ArrayList();
+        public ArrayList<Double> leftEyeMouthRatios = new ArrayList();
+
+        public double eyesRatio = 0;
+        public double rightEyeMouthRatio = 0;
+        public double leftEyeMouthRatio = 0;
+
+        public void avg() {
+            double tempEyesRatio = 0;
+            for (int index = 0; index < eyesRatios.size(); index ++) {
+                tempEyesRatio += eyesRatios.get(index);
+            }
+            eyesRatio = tempEyesRatio / eyesRatios.size();
+
+            double tempRightEyeMouthRatios = 0;
+            for (int index = 0; index < rightEyeMouthRatios.size(); index ++) {
+                tempRightEyeMouthRatios += rightEyeMouthRatios.get(index);
+            }
+            rightEyeMouthRatio = tempRightEyeMouthRatios / rightEyeMouthRatios.size();
+
+            double tempLeftEyeMouthRatio = 0;
+            for (int index = 0; index < leftEyeMouthRatios.size(); index ++) {
+                tempLeftEyeMouthRatio += leftEyeMouthRatios.get(index);
+            }
+            leftEyeMouthRatio = tempLeftEyeMouthRatio / leftEyeMouthRatios.size();
+        }
+    }
+
+    static FaceDetailsAvg faceDetailsAvg;
 
     // Record the previously seen proportions of the landmark locations relative to the bounding box
     // of the face.  These proportions can be used to approximate where the landmarks are within the
@@ -29,6 +65,7 @@ public class FaceTracker extends Tracker<Face> {
     FaceTracker(GraphicOverlay overlay) {
         mOverlay = overlay;
         mFaceGraphic = new FaceGraphic(overlay);
+        faceDetailsAvg = new FaceDetailsAvg();
     }
 
     /**
@@ -112,33 +149,42 @@ public class FaceTracker extends Tracker<Face> {
 
 
     private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
+        //Here we calculate the distance of each point
         double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
         double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
         double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
         double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
         double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
         double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
+        if ((leftEyeXposition != 0) && (leftEyeYposition != 0) && (rightEyeXposition != 0) && (rightEyeYposition != 0) && (bottomMouthXposition != 0) && (bottomMouthYposition != 0) ) {
+            int eyesDistance = (int) Math.sqrt( Math.pow((leftEyeXposition - rightEyeXposition),2) + Math.pow((leftEyeYposition - rightEyeYposition),2));
+            int rightEyeMouseDistance = (int) Math.sqrt( Math.pow((rightEyeXposition - bottomMouthXposition),2) + Math.pow((rightEyeYposition - bottomMouthYposition),2));
+            int leftEyeMouseDistance = (int) Math.sqrt( Math.pow((leftEyeXposition - bottomMouthXposition),2) + Math.pow((leftEyeYposition - bottomMouthYposition),2));
+            int minValue = Math.min(Math.min(eyesDistance,rightEyeMouseDistance),leftEyeMouseDistance);
 
-        //Here we calculate the distance of each point
-        int eyesDistance = (int) Math.sqrt( Math.pow((leftEyeXposition - rightEyeXposition),2) + Math.pow((leftEyeYposition - rightEyeYposition),2));
-        int rightEyeMouseDistance = (int) Math.sqrt( Math.pow((rightEyeXposition - bottomMouthXposition),2) + Math.pow((rightEyeYposition - bottomMouthYposition),2));
-        int leftEyeMouseDistance = (int) Math.sqrt( Math.pow((leftEyeXposition - bottomMouthXposition),2) + Math.pow((leftEyeYposition - bottomMouthYposition),2));
+            Log.v("eyes distance", "" + eyesDistance);
+            Log.v("reye-mouth", "" + rightEyeMouseDistance);
+            Log.v("leye-mouth", "" + leftEyeMouseDistance);
 
-        //This is a way to calculate the ratio of each distance we divide each distance by the lower distance
-        int minValue = Math.min(Math.min(eyesDistance,rightEyeMouseDistance),leftEyeMouseDistance);
-        double eyesRatio = (double) eyesDistance / minValue;
-        double rightEyeMouthRatio = (double) rightEyeMouseDistance  / minValue;
-        double leftEyeMouthRatio = (double) leftEyeMouseDistance / minValue;
-//
-//        //Printing results
-        Log.v("Eyes distance: ", eyesDistance + "");
-        Log.v("R.eye-Mouth distance ", rightEyeMouseDistance + "");
-        Log.v("L.Eye-Mouth distance ", leftEyeMouseDistance + "");
-        Log.v("min value", minValue + "");
-        Log.v("Eyes distance Ratio", eyesRatio + "");
-        Log.v("Right eye mouth ratio", rightEyeMouthRatio + "");
-        Log.v("Left eye mouth ratio", leftEyeMouthRatio + "");
+            faceDetailsAvg.eyesRatios.add((double) eyesDistance / minValue);
+            faceDetailsAvg.rightEyeMouthRatios.add((double) rightEyeMouseDistance  / minValue);
+            faceDetailsAvg.leftEyeMouthRatios.add((double) leftEyeMouseDistance / minValue);
 
+            faceDetailsAvg.avg();
+
+            //Printing results
+//            Log.v("Eyes distance: ", eyesDistance + "");
+//            Log.v("R.eye-Mouth distance ", rightEyeMouseDistance + "");
+//            Log.v("L.Eye-Mouth distance ", leftEyeMouseDistance + "");
+//            Log.v("min value", minValue + "");
+
+            //This is a way to calculate the ratio of each distance we divide each distance by the lower distance
+            Log.v("Eyes distance Ratio", String.format("%.3f", faceDetailsAvg.eyesRatio));
+            Log.v("Left eye mouth ratio", String.format("%.3f", faceDetailsAvg.rightEyeMouthRatio));
+            Log.v("Right eye mouth ratio", String.format("%.3f", faceDetailsAvg.leftEyeMouthRatio));
+        }
+        else {
+            Log.v("Nothing", "Detected");
+        }
     }
-
 }
