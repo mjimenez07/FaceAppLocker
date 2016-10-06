@@ -116,13 +116,4 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
         canvas.drawRect(left, top, right, bottom, mBoxPaint);
 
     }
-
-    public Map neka() {
-        canvasDimensions.put("left", left);
-        canvasDimensions.put("top", top);
-        canvasDimensions.put("right", right);
-        canvasDimensions.put("bottom", bottom);
-
-        return canvasDimensions;
-    }
 }

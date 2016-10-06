@@ -112,32 +112,32 @@ public class FaceTracker extends Tracker<Face> {
 
 
     private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
-        //Todo calculate the distance of each point with this formula link http://stackoverflow.com/questions/20916953/get-distance-between-two-points-in-canvas
-
-//            double L = Math.abs(mFaceGraphic.left - mFaceGraphic.right);
-//            double W = Math.abs(mFaceGraphic.left - mFaceGraphic.bottom);
-//            double Area = L * W;
         double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
         double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
         double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
         double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
-        double bottomMouthXposition = (double) bottomMouthPosition.x;
-        double bottomMouthYposition = (double) bottomMouthPosition.y;
-        int distanceLeftEyeToRighteye = (int) Math.sqrt( Math.pow((leftEyeXposition - rightEyeXposition),2) + Math.pow((leftEyeYposition - rightEyeYposition),2));
-        double distanceLeftEyeToBottomMouse = 0;
-        double distanceRightEyeToBottomMouse = 0;
-        Log.v("Distance", distanceLeftEyeToRighteye + "");
+        double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
+        double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
 
+        //Here we calculate the distance of each point
+        int eyesDistance = (int) Math.sqrt( Math.pow((leftEyeXposition - rightEyeXposition),2) + Math.pow((leftEyeYposition - rightEyeYposition),2));
+        int rightEyeMouseDistance = (int) Math.sqrt( Math.pow((rightEyeXposition - bottomMouthXposition),2) + Math.pow((rightEyeYposition - bottomMouthYposition),2));
+        int leftEyeMouseDistance = (int) Math.sqrt( Math.pow((leftEyeXposition - bottomMouthXposition),2) + Math.pow((leftEyeYposition - bottomMouthYposition),2));
 
-//            Log.v("Rectangle area: ", "Area: " + L * W);
-//            Log.v("Left Eye coordinates: ", "X position: " + leftEyeXposition * Area + " Y position: " + leftEyeYposition * Area);
-//            Log.v("Right Eye coordinates: ", "X position: " + rightEyeXposition  * Area + " Y position: " + rightEyeYposition * Area );
-
-
-
-        //Log.v("Rectangle coordinates: ", "L: " + Math.abs(mFaceGraphic.left - mFaceGraphic.right));
-        //Log.v("Rectangle coordinates: ", "W: " + Math.abs(mFaceGraphic.left - mFaceGraphic.bottom));
-
+        //This is a way to calculate the ratio of each distance we divide each distance by the lower distance
+        int minValue = Math.min(Math.min(eyesDistance,rightEyeMouseDistance),leftEyeMouseDistance);
+        float eyesRatio = eyesDistance / minValue;
+        float rightEyeMouthRatio = rightEyeMouseDistance  / minValue;
+        float leftEyeMouthRatio = leftEyeMouseDistance / minValue;
+//
+//        //Printing results
+        Log.v("Eyes distance: ", eyesDistance + "");
+        Log.v("R.eye-Mouth distance ", rightEyeMouseDistance + "");
+        Log.v("L.Eye-Mouth distance ", leftEyeMouseDistance + "");
+        Log.v("min value", minValue + "");
+        Log.v("Eyes distance Ratio", eyesRatio + "");
+        Log.v("Right eye mouth ratio", rightEyeMouthRatio + "");
+        Log.v("Left eye mouth ratio", leftEyeMouthRatio + "");
 
     }
 
