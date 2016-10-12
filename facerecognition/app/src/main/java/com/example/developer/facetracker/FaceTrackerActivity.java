@@ -96,7 +96,7 @@ public class FaceTrackerActivity extends AppCompatActivity {
     // Creates and start the camera.
     private void createCameraSource() {
         Context context =  getApplicationContext();
-        FaceDetector detector = createFaceDetector(context);
+        FaceDetector detector = createFaceDetector(context,mPreview);
 
         mCameraSource = new CameraSource.Builder(context, detector)
                 .setRequestedPreviewSize(640, 480)
@@ -221,7 +221,7 @@ public class FaceTrackerActivity extends AppCompatActivity {
 
     /** Here we build the face detector instance.
      */
-    private FaceDetector createFaceDetector(Context context) {
+    private FaceDetector createFaceDetector(Context context, CameraSourcePreview mPreview) {
 
         FaceDetector detector = new FaceDetector.Builder(context)
                 .setTrackingEnabled(true)
@@ -231,7 +231,7 @@ public class FaceTrackerActivity extends AppCompatActivity {
                 .build();
 
         Detector.Processor<Face> processor;
-        Tracker<Face> tracker = new FaceTracker(mGraphicOverlay);
+        Tracker<Face> tracker = new FaceTracker(mGraphicOverlay, mPreview, context);
         processor = new LargestFaceFocusingProcessor(detector, tracker);
 
         detector.setProcessor(processor);
