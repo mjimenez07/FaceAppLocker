@@ -69,7 +69,7 @@ public class CameraSourcePreview extends ViewGroup{
         }
     }
 
-    private void startIfReady() throws IOException {
+    public void startIfReady() throws IOException {
         if (mStartRequested && mSurfaceAvailable) {
             mCameraSource.start(mSurfaceView.getHolder());
             if (mOverlay != null) {

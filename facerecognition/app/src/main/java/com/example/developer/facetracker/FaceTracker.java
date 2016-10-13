@@ -24,7 +24,7 @@ public class FaceTracker extends Tracker<Face> {
     private GraphicOverlay mOverlay;
     private FaceGraphic mFaceGraphic;
     private Context activityContext;
-    public double[] distanceRatioArray = new  double[10];
+    public double[] distanceRatioArray = new double[10];
     public int index = 0;
     private CameraSourcePreview mPreview;
 
@@ -39,19 +39,19 @@ public class FaceTracker extends Tracker<Face> {
 
         public void avg() {
             double tempEyesRatio = 0;
-            for (int index = 0; index < eyesRatios.size(); index ++) {
+            for (int index = 0; index < eyesRatios.size(); index++) {
                 tempEyesRatio += eyesRatios.get(index);
             }
             eyesRatio = tempEyesRatio / eyesRatios.size();
 
             double tempRightEyeMouthRatios = 0;
-            for (int index = 0; index < rightEyeMouthRatios.size(); index ++) {
+            for (int index = 0; index < rightEyeMouthRatios.size(); index++) {
                 tempRightEyeMouthRatios += rightEyeMouthRatios.get(index);
             }
             rightEyeMouthRatio = tempRightEyeMouthRatios / rightEyeMouthRatios.size();
 
             double tempLeftEyeMouthRatio = 0;
-            for (int index = 0; index < leftEyeMouthRatios.size(); index ++) {
+            for (int index = 0; index < leftEyeMouthRatios.size(); index++) {
                 tempLeftEyeMouthRatio += leftEyeMouthRatios.get(index);
             }
             leftEyeMouthRatio = tempLeftEyeMouthRatio / leftEyeMouthRatios.size();
@@ -71,6 +71,9 @@ public class FaceTracker extends Tracker<Face> {
         faceDetailsAvg = new FaceDetailsAvg();
         mPreview = preview;
         activityContext = context;
+        SharedPreferences.Editor editor = getEditor(activityContext);
+        editor.putFloat("Eyes_distance_ratio", 0.0f);
+        editor.commit();
 
     }
 
@@ -132,9 +135,9 @@ public class FaceTracker extends Tracker<Face> {
     /**
      * function getLandmarkPosition
      *
-     * @param face face objects that we will use to take the landmarks
+     * @param face       face objects that we will use to take the landmarks
      * @param landMarkID int value of the landmark needed
-     *  return landmark position
+     *                   return landmark position
      **/
     private PointF getLandmarkPosition(Face face, int landMarkID) {
         for (Landmark landmark : face.getLandmarks()) {
@@ -180,6 +183,10 @@ public class FaceTracker extends Tracker<Face> {
 
                 faceDetailsAvg.avg();
 
+                Log.v("eyes distance", "" + faceDetailsAvg.eyesRatio);
+                Log.v("reye-mouth", "" + faceDetailsAvg.leftEyeMouthRatio);
+                Log.v("leye-mouth", "" + faceDetailsAvg.rightEyeMouthRatio);
+
                 //Printing results
 //            Log.v("Eyes distance: ", eyesDistance + "");
 //            Log.v("R.eye-Mouth distance ", rightEyeMouseDistance + "");
@@ -187,24 +194,64 @@ public class FaceTracker extends Tracker<Face> {
 //            Log.v("min value", minValue + "");
 
                 //This is a way to calculate the ratio of each distance we divide each distance by the lower distance
-                Log.v("Eyes distance Ratio", String.format("%.3f", faceDetailsAvg.eyesRatio));
-                Log.v("Left eye mouth ratio", String.format("%.3f", faceDetailsAvg.leftEyeMouthRatio));
-                Log.v("Right eye mouth ratio", String.format("%.3f", faceDetailsAvg.rightEyeMouthRatio));
+//                Log.v("Eyes distance Ratio", String.format("%.3f", faceDetailsAvg.eyesRatio));
+//                Log.v("Left eye mouth ratio", String.format("%.3f", faceDetailsAvg.leftEyeMouthRatio));
+//                Log.v("Right eye mouth ratio", String.format("%.3f", faceDetailsAvg.rightEyeMouthRatio));
             } else {
                 Log.v("Nothing", "Detected");
             }
 
             index++;
         } else {
-            mPreview.stop();
-            SharedPreferences neka = activityContext.getSharedPreferences("FaceInfo", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = neka.edit();
-            editor.putFloat("Eyes distance ratio", (float) faceDetailsAvg.eyesRatio);
-            editor.putFloat("Left eye bottom mouth ratio", (float) faceDetailsAvg.leftEyeMouthRatio);
-            editor.putFloat("neka", (float) faceDetailsAvg.rightEyeMouthRatio);
-            if (editor.commit()) {
+            Log.v("neka", "stop");
+            Log.v("Here", getSharedPrerence(activityContext).getFloat("Eyes_distance_ratio", 0.0f) + "");
+            //mPreview.stop();
+            if (getSharedPrerence(activityContext).getFloat("Eyes_distance_ratio", 0.0f) == 0.0f) {
 
+                Log.v("neka", "inserting");
+
+                SharedPreferences.Editor editor = getEditor(activityContext);
+                editor.putFloat("Eyes_distance_ratio", (float) faceDetailsAvg.eyesRatio);
+                editor.putFloat("Left_eye_bottom_mouth_ratio", (float) faceDetailsAvg.leftEyeMouthRatio);
+                editor.putFloat("neka", (float) faceDetailsAvg.rightEyeMouthRatio);
+
+
+                if (editor.commit()) {
+                    Log.v("neka", "commiting");
+//                    try {
+//                        Log.v("neka", "reset");
+//                        mPreview.startIfReady();
+//                    }catch(Exception e) {
+//                        e.printStackTrace();
+//                    }
+                    faceDetailsAvg.eyesRatios.clear();
+                    faceDetailsAvg.leftEyeMouthRatios.clear();
+                    faceDetailsAvg.rightEyeMouthRatios.clear();
+                    index = 0;
+                }
+            } else {
+                Log.v("neka","neka");
+                Log.v("saved value",  String.valueOf(getSharedPrerence(activityContext).getFloat("Eyes_distance_ratio", 0.0f)));
+                Log.v("current value", String.valueOf(faceDetailsAvg.eyesRatio));
+                if (getSharedPrerence(activityContext).getFloat("Eyes_distance_ratio", 0.0f) == faceDetailsAvg.eyesRatio) {
+                    Log.v("neka", "equals");
+                } else {
+                    Log.v("neka", "not equals");
+                }
+
+                mPreview.stop();
             }
+
+
         }
+    }
+
+    public SharedPreferences getSharedPrerence(Context context) {
+        SharedPreferences neka = context.getSharedPreferences("FaceInfo", Context.MODE_PRIVATE);
+        return neka;
+    }
+
+    public SharedPreferences.Editor getEditor(Context context) {
+        return getSharedPrerence(context).edit();
     }
 }
