@@ -98,8 +98,8 @@ public class FaceTracker extends Tracker<Face> {
         PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
 
 
-        mFaceGraphic.updateFace(face);
         landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
+        mFaceGraphic.updateFace(face);
 
     }
 
