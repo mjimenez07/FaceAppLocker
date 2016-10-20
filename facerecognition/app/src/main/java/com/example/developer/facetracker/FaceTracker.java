@@ -1,18 +1,17 @@
 package com.example.developer.facetracker;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PointF;
 import android.util.Log;
-
 import com.example.developer.facetracker.ui.camera.CameraSourcePreview;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,9 +23,8 @@ public class FaceTracker extends Tracker<Face> {
     private GraphicOverlay mOverlay;
     private FaceGraphic mFaceGraphic;
     private Context activityContext;
-    public double[] distanceRatioArray = new double[10];
     public int index = 0;
-    private CameraSourcePreview mPreview;
+    private Activity mActivity;
 
     class FaceDetailsAvg {
         public ArrayList<Double> eyesRatios = new ArrayList();
@@ -65,16 +63,12 @@ public class FaceTracker extends Tracker<Face> {
     // face bounding box if the eye landmark is missing in a future update.
     private Map<Integer, PointF> mPreviousProportions = new HashMap<>();
 
-    FaceTracker(GraphicOverlay overlay, CameraSourcePreview preview, Context context) {
+    FaceTracker(GraphicOverlay overlay, Activity activity, Context context) {
         mOverlay = overlay;
         mFaceGraphic = new FaceGraphic(overlay);
         faceDetailsAvg = new FaceDetailsAvg();
-        mPreview = preview;
+        mActivity = activity;
         activityContext = context;
-        SharedPreferences.Editor editor = getEditor(activityContext);
-        editor.putFloat("Eyes_distance_ratio", 0.0f);
-        editor.commit();
-
     }
 
     /**
@@ -160,7 +154,7 @@ public class FaceTracker extends Tracker<Face> {
     private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
         //Here we calculate the distance of each point
 
-        if (index < 10) {
+        if (index < 20) {
             double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
             double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
             double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
@@ -173,9 +167,9 @@ public class FaceTracker extends Tracker<Face> {
                 int leftEyeMouseDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - bottomMouthXposition), 2) + Math.pow((leftEyeYposition - bottomMouthYposition), 2));
                 int minValue = Math.min(Math.min(eyesDistance, rightEyeMouseDistance), leftEyeMouseDistance);
 
-                Log.v("eyes distance", "" + eyesDistance);
-                Log.v("reye-mouth", "" + rightEyeMouseDistance);
-                Log.v("leye-mouth", "" + leftEyeMouseDistance);
+//                Log.v("eyes distance", "" + eyesDistance);
+//                Log.v("reye-mouth", "" + rightEyeMouseDistance);
+//                Log.v("leye-mouth", "" + leftEyeMouseDistance);
 
                 faceDetailsAvg.eyesRatios.add((double) eyesDistance / minValue);
                 faceDetailsAvg.rightEyeMouthRatios.add((double) rightEyeMouseDistance / minValue);
@@ -183,9 +177,9 @@ public class FaceTracker extends Tracker<Face> {
 
                 faceDetailsAvg.avg();
 
-                Log.v("eyes distance", "" + faceDetailsAvg.eyesRatio);
-                Log.v("reye-mouth", "" + faceDetailsAvg.leftEyeMouthRatio);
-                Log.v("leye-mouth", "" + faceDetailsAvg.rightEyeMouthRatio);
+//                Log.v("eyes distance", "" + faceDetailsAvg.eyesRatio);
+//                Log.v("reye-mouth", "" + faceDetailsAvg.leftEyeMouthRatio);
+//                Log.v("leye-mouth", "" + faceDetailsAvg.rightEyeMouthRatio);
 
                 //Printing results
 //            Log.v("Eyes distance: ", eyesDistance + "");
@@ -203,52 +197,34 @@ public class FaceTracker extends Tracker<Face> {
 
             index++;
         } else {
-            Log.v("neka", "stop");
-            Log.v("Here", getSharedPrerence(activityContext).getFloat("Eyes_distance_ratio", 0.0f) + "");
-            //mPreview.stop();
-            if (getSharedPrerence(activityContext).getFloat("Eyes_distance_ratio", 0.0f) == 0.0f) {
+            SharedPreferences.Editor editor = getEditor(activityContext);
+            editor.putFloat("Eyes_distance_ratio", (float) faceDetailsAvg.eyesRatio);
+            editor.putFloat("Left_eye_bottom_mouth_ratio", (float) faceDetailsAvg.leftEyeMouthRatio);
+            editor.putFloat("Right_eye_bottom_mouth_ratio", (float) faceDetailsAvg.rightEyeMouthRatio);
 
-                Log.v("neka", "inserting");
+            if (editor.commit()) {
+                Log.v("Face information: ", "Saved");
+                Log.v("Eyes ratio", faceDetailsAvg.eyesRatio + "");
+                Log.v("Left eye mouth ratio", faceDetailsAvg.leftEyeMouthRatio + "");
+                Log.v("Right eye mouth  ratio", faceDetailsAvg.rightEyeMouthRatio + "");
+                Log.v("next step", "List app activity will be launched");
+                faceDetailsAvg.eyesRatios.clear();
+                faceDetailsAvg.leftEyeMouthRatios.clear();
+                faceDetailsAvg.rightEyeMouthRatios.clear();
+                index = 0;
+                Intent intent = new Intent(activityContext, ListApplicationActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                activityContext.startActivity(intent);
+                mActivity.finish();
 
-                SharedPreferences.Editor editor = getEditor(activityContext);
-                editor.putFloat("Eyes_distance_ratio", (float) faceDetailsAvg.eyesRatio);
-                editor.putFloat("Left_eye_bottom_mouth_ratio", (float) faceDetailsAvg.leftEyeMouthRatio);
-                editor.putFloat("neka", (float) faceDetailsAvg.rightEyeMouthRatio);
-
-
-                if (editor.commit()) {
-                    Log.v("neka", "commiting");
-//                    try {
-//                        Log.v("neka", "reset");
-//                        mPreview.startIfReady();
-//                    }catch(Exception e) {
-//                        e.printStackTrace();
-//                    }
-                    faceDetailsAvg.eyesRatios.clear();
-                    faceDetailsAvg.leftEyeMouthRatios.clear();
-                    faceDetailsAvg.rightEyeMouthRatios.clear();
-                    index = 0;
-                }
-            } else {
-                Log.v("neka","neka");
-                Log.v("saved value",  String.valueOf(getSharedPrerence(activityContext).getFloat("Eyes_distance_ratio", 0.0f)));
-                Log.v("current value", String.valueOf(faceDetailsAvg.eyesRatio));
-                if (getSharedPrerence(activityContext).getFloat("Eyes_distance_ratio", 0.0f) == faceDetailsAvg.eyesRatio) {
-                    Log.v("neka", "equals");
-                } else {
-                    Log.v("neka", "not equals");
-                }
-
-                mPreview.stop();
+                //Todo release the cameara and the preview before closing this activity.
             }
-
-
         }
     }
 
     public SharedPreferences getSharedPrerence(Context context) {
-        SharedPreferences neka = context.getSharedPreferences("FaceInfo", Context.MODE_PRIVATE);
-        return neka;
+        SharedPreferences shrdprefences = context.getSharedPreferences("FaceInfo", Context.MODE_PRIVATE);
+        return shrdprefences;
     }
 
     public SharedPreferences.Editor getEditor(Context context) {

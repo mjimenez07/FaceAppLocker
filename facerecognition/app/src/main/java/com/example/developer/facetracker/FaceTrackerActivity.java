@@ -219,7 +219,7 @@ public class FaceTrackerActivity extends AppCompatActivity {
                 .build();
 
         Detector.Processor<Face> processor;
-        Tracker<Face> tracker = new FaceTracker(mGraphicOverlay, mPreview, context);
+        Tracker<Face> tracker = new FaceTracker(mGraphicOverlay, this, context);
         processor = new LargestFaceFocusingProcessor(detector, tracker);
 
         detector.setProcessor(processor);
