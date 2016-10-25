@@ -20,6 +20,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <service android:name=".AppTrackerService"
+            android:enabled="true">
+        </service>
         <activity android:name=".FaceTrackerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

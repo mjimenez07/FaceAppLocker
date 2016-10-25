@@ -1,6 +1,7 @@
 package com.example.developer.facetracker;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.app.ProgressDialog;
 import android.content.pm.ApplicationInfo;
@@ -28,6 +29,14 @@ public class ListApplicationActivity extends ListActivity {
 
         packageManager = getPackageManager();
         new LoadApplications().execute();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Intent callService = new Intent(this, AppTrackerService.class);
+        startService(callService);
 
     }
 
@@ -81,4 +90,5 @@ public class ListApplicationActivity extends ListActivity {
             super.onPreExecute();
         }
     }
+
 }

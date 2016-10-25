@@ -13,9 +13,7 @@ import com.google.android.gms.vision.face.Landmark;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by Mario on 9/13/2016.
- */
+
 public class FaceGraphic  extends GraphicOverlay.Graphic {
     private static final float FACE_POSITION_RADIUS = 10.0f;
     private static final float ID_TEXT_SIZE = 40.0f;
