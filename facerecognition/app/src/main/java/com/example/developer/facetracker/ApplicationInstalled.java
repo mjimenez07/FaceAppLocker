@@ -1,12 +1,9 @@
-package mariotest.listapp;
+package com.example.developer.facetracker;
+
 
 import android.content.pm.ApplicationInfo;
 
-/**
- * Created by User on 5/20/2016.
- */
 public class ApplicationInstalled {
-
     private ApplicationInfo appInfo;
     private boolean isActive = false;
 

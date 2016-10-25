@@ -1,4 +1,4 @@
-package mariotest.listapp;
+package com.example.developer.facetracker;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,11 +12,9 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
-public class AppAdapter  extends BaseAdapter {
+public class AppAdapter extends BaseAdapter {
     private Activity appContext;
     private List<ApplicationInstalled> appList;
     private LayoutInflater layoutInflater;
