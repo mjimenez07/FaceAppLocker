@@ -53,7 +53,6 @@ public class ListApplicationActivity extends ListActivity {
 
         for (ApplicationInfo application : list) {
             try {
-                Log.v("app name", (application.flags & ApplicationInfo.FLAG_SYSTEM) + " " + application.packageName);
                 if (((application.flags & ApplicationInfo.FLAG_SYSTEM) == 0) || (application.packageName.contains("google"))) {
                     appInstaledlist.add(new ApplicationInstalled(application, false));
                 }

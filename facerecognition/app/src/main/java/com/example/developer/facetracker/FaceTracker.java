@@ -217,7 +217,7 @@ public class FaceTracker extends Tracker<Face> {
                 activityContext.startActivity(intent);
                 mActivity.finish();
 
-                //Todo release the cameara and the preview before closing this activity.
+                //Todo release the camera and the preview before closing this activity.
             }
         }
     }
