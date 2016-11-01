@@ -62,7 +62,8 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        //Calling service
+        Intent callService = new Intent(this, AppTrackService.class);
+        startService(callService);
     }
 
     @Override
