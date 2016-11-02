@@ -1,9 +1,13 @@
 package com.example.developer.trackapps;
 
+import android.app.AlertDialog;
 import android.app.AppOpsManager;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -36,17 +40,34 @@ public class MainActivity extends ListActivity {
         checkPermissions();
 
     }
+
     private void checkPermissions() {
         if (hasPermissions()) {
             new LoadApplications().execute();
+            Intent callService = new Intent(this, AppTrackService.class);
+            startService(callService);
         } else {
             requestPermission();
         }
     }
 
     private void requestPermission() {
-        Toast.makeText(this, "Need to request permission", Toast.LENGTH_SHORT).show();
-        startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Request permissions")
+                .setMessage("In order to enable the app work as expected please grant us the permissions to track the app data")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivityForResult(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS), MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }).show();
     }
 
     @Override
@@ -62,8 +83,6 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        Intent callService = new Intent(this, AppTrackService.class);
-        startService(callService);
     }
 
     @Override
@@ -122,4 +141,5 @@ public class MainActivity extends ListActivity {
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), getPackageName());
         return mode == AppOpsManager.MODE_ALLOWED;
     }
+
 }
