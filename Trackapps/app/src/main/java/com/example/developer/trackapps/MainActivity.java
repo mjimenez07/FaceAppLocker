@@ -38,7 +38,6 @@ public class MainActivity extends ListActivity {
         setContentView(R.layout.activity_main);
         packageManager = getPackageManager();
         checkPermissions();
-
     }
 
     private void checkPermissions() {
@@ -83,6 +82,12 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        for (ApplicationInstalled singleApp: appInstaledlist) {
+            if (singleApp.isActive()) {
+                Log.v("add to editor", singleApp.getAppInfo().packageName);
+            }
+        }
+
     }
 
     @Override
@@ -90,7 +95,7 @@ public class MainActivity extends ListActivity {
         ApplicationInstalled app = (ApplicationInstalled) listadapter.getItem(position);
         app.setIsActive(!app.isActive());
         listadapter.notifyDataSetChanged();
-        Log.v("app name",app.getAppInfo().packageName);
+        Log.v("app name",app.getAppInfo().packageName + " enabled to track " + app.isActive());
     }
 
     private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
