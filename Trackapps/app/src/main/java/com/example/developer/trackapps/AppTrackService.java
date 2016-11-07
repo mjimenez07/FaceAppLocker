@@ -1,5 +1,6 @@
 package com.example.developer.trackapps;
 
+import android.app.ActivityManager;
 import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -10,6 +11,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.Timer;
@@ -32,10 +34,11 @@ public class AppTrackService extends Service {
         super.onCreate();
         Log.v("Service to track apps", "Created");
         SharedPreferences sharedPref = getSharedPreferences("AppsToBeBlocked", MODE_PRIVATE);
-        Log.v("sharedpref", sharedPref.getString("ListToTrack", null));
+        final String [] arrayToCheck = sharedPref.getString("ListToTrack", null).split(",");
         Timer timer = new Timer();
         TimerTask refresher = new TimerTask() {
             public void run() {
+                ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
                 String topPackageName = null;
                 Context context = getApplicationContext();
                 UsageStatsManager usage = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
@@ -52,6 +55,13 @@ public class AppTrackService extends Service {
                     }
                     topPackageName =  runningTask.get(runningTask.lastKey()).getPackageName();
                     Log.v("service", "Current app " + topPackageName);
+
+                    if (Arrays.asList(arrayToCheck).contains(topPackageName)) {
+                        activityManager.killBackgroundProcesses(topPackageName);
+                        Intent intent = new Intent(context, FaceRecognitionActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
                 }
             };
         };
