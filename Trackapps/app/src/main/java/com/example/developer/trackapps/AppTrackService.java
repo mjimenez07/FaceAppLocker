@@ -5,6 +5,7 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -30,7 +31,8 @@ public class AppTrackService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.v("Service to track apps", "Created");
-
+        SharedPreferences sharedPref = getSharedPreferences("AppsToBeBlocked", MODE_PRIVATE);
+        Log.v("sharedpref", sharedPref.getString("ListToTrack", null));
         Timer timer = new Timer();
         TimerTask refresher = new TimerTask() {
             public void run() {

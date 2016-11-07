@@ -2,23 +2,20 @@ package com.example.developer.trackapps;
 
 import android.app.AlertDialog;
 import android.app.AppOpsManager;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +28,8 @@ public class MainActivity extends ListActivity {
     private List<ApplicationInfo> applist = null;
     private Vector<ApplicationInstalled> appInstaledlist = new Vector<ApplicationInstalled>();
     private AppAdapter listadapter = null;
+    private String listToTrack = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +42,6 @@ public class MainActivity extends ListActivity {
     private void checkPermissions() {
         if (hasPermissions()) {
             new LoadApplications().execute();
-            Intent callService = new Intent(this, AppTrackService.class);
-            startService(callService);
         } else {
             requestPermission();
         }
@@ -82,12 +79,18 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        for (ApplicationInstalled singleApp: appInstaledlist) {
-            if (singleApp.isActive()) {
-                Log.v("add to editor", singleApp.getAppInfo().packageName);
+        if (hasPermissions()) {
+            for (ApplicationInstalled singleApp: appInstaledlist) {
+                if (singleApp.isActive()) {
+                    listToTrack = listToTrack + singleApp.getAppInfo().packageName + ",";
+                }
             }
+            SharedPreferences.Editor editor = getEditor(getApplicationContext());
+            editor.putString("ListToTrack", listToTrack);
+            editor.commit();
+            Intent callService = new Intent(this, AppTrackService.class);
+            startService(callService);
         }
-
     }
 
     @Override
@@ -147,4 +150,13 @@ public class MainActivity extends ListActivity {
         return mode == AppOpsManager.MODE_ALLOWED;
     }
 
+
+    public SharedPreferences getSharedPrerence(Context context) {
+        SharedPreferences shrdprefences = context.getSharedPreferences("AppsToBeBlocked", Context.MODE_PRIVATE);
+        return shrdprefences;
+    }
+
+    public SharedPreferences.Editor getEditor(Context context) {
+        return getSharedPrerence(context).edit();
+    }
 }
