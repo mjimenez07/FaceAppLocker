@@ -57,7 +57,6 @@ public class AppTrackService extends Service {
                     Log.v("service", "Current app " + topPackageName);
 
                     if (Arrays.asList(arrayToCheck).contains(topPackageName)) {
-                        activityManager.killBackgroundProcesses(topPackageName);
                         Intent intent = new Intent(context, FaceRecognitionActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(intent);
