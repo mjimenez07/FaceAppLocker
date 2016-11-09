@@ -21,7 +21,9 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             EditText passwdText = (EditText) findViewById(R.id.password);
             @Override
             public void onClick(View v) {
+
                 if (passwdText.getText() != null) {
+                    sendCustomBroadcast();
                     finish();
                 }
             }
@@ -36,5 +38,11 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         startHomescreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(startHomescreen);
         finish();
+    }
+
+    public  void sendCustomBroadcast() {
+        Intent intent = new Intent();
+        intent.setAction(getString(R.string.broadcast_enable_app_receiver_action));
+        sendBroadcast(intent);
     }
 }

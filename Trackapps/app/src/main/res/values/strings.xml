@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Track apps</string>
+    <string name="broadcast_enable_app_receiver_action">com.example.developer.trackapps.ENABLE_APP"</string>
 </resources>
