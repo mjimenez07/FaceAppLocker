@@ -6,4 +6,5 @@
     <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>
     <string name="title_activity_list_application_activity">list_application_activity</string>
     <string name="title_activity_list_application">ListApplicationActivity</string>
+    <string name="broadcast_enable_app_receiver_action">com.example.developer.trackapps.ENABLE_APP"</string>
 </resources>
