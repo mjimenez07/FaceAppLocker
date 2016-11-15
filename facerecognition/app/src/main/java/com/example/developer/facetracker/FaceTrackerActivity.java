@@ -6,6 +6,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -40,6 +42,16 @@ public class FaceTrackerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_tracker);
+        SharedPreferences sharedPref = getSharedPreferences("FaceInfo", MODE_PRIVATE);
+
+        /**Checking if we already ran the app for the first time and saved user face information
+         * if it's true will directly open to the list activity
+         */
+        if (sharedPref.contains("Eyes ratio")) {
+            Intent intent = new Intent(getApplicationContext(), ListApplicationActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);

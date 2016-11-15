@@ -41,6 +41,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ListApplicationActivity"></activity>
+        <activity android:name=".FaceRecognitionActivity"></activity>
     </application>
 
 </manifest>

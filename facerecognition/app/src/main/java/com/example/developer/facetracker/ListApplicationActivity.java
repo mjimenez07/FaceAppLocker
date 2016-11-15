@@ -34,7 +34,7 @@ public class ListApplicationActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list_view);
+        setContentView(R.layout.activity_list_application);
         packageManager = getPackageManager();
         checkPermissions();
     }

@@ -161,36 +161,18 @@ public class FaceTracker extends Tracker<Face> {
             double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
             double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
             double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
+
             if ((leftEyeXposition != 0) && (leftEyeYposition != 0) && (rightEyeXposition != 0) && (rightEyeYposition != 0) && (bottomMouthXposition != 0) && (bottomMouthYposition != 0)) {
                 int eyesDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - rightEyeXposition), 2) + Math.pow((leftEyeYposition - rightEyeYposition), 2));
                 int rightEyeMouseDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - bottomMouthXposition), 2) + Math.pow((rightEyeYposition - bottomMouthYposition), 2));
                 int leftEyeMouseDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - bottomMouthXposition), 2) + Math.pow((leftEyeYposition - bottomMouthYposition), 2));
                 int minValue = Math.min(Math.min(eyesDistance, rightEyeMouseDistance), leftEyeMouseDistance);
 
-//                Log.v("eyes distance", "" + eyesDistance);
-//                Log.v("reye-mouth", "" + rightEyeMouseDistance);
-//                Log.v("leye-mouth", "" + leftEyeMouseDistance);
-
                 faceDetailsAvg.eyesRatios.add((double) eyesDistance / minValue);
                 faceDetailsAvg.rightEyeMouthRatios.add((double) rightEyeMouseDistance / minValue);
                 faceDetailsAvg.leftEyeMouthRatios.add((double) leftEyeMouseDistance / minValue);
 
                 faceDetailsAvg.avg();
-
-//                Log.v("eyes distance", "" + faceDetailsAvg.eyesRatio);
-//                Log.v("reye-mouth", "" + faceDetailsAvg.leftEyeMouthRatio);
-//                Log.v("leye-mouth", "" + faceDetailsAvg.rightEyeMouthRatio);
-
-                //Printing results
-//            Log.v("Eyes distance: ", eyesDistance + "");
-//            Log.v("R.eye-Mouth distance ", rightEyeMouseDistance + "");
-//            Log.v("L.Eye-Mouth distance ", leftEyeMouseDistance + "");
-//            Log.v("min value", minValue + "");
-
-                //This is a way to calculate the ratio of each distance we divide each distance by the lower distance
-//                Log.v("Eyes distance Ratio", String.format("%.3f", faceDetailsAvg.eyesRatio));
-//                Log.v("Left eye mouth ratio", String.format("%.3f", faceDetailsAvg.leftEyeMouthRatio));
-//                Log.v("Right eye mouth ratio", String.format("%.3f", faceDetailsAvg.rightEyeMouthRatio));
             } else {
                 Log.v("Nothing", "Detected");
             }
@@ -204,10 +186,9 @@ public class FaceTracker extends Tracker<Face> {
 
             if (editor.commit()) {
                 Log.v("Face information: ", "Saved");
-                Log.v("Eyes ratio", faceDetailsAvg.eyesRatio + "");
-                Log.v("Left eye mouth ratio", faceDetailsAvg.leftEyeMouthRatio + "");
-                Log.v("Right eye mouth  ratio", faceDetailsAvg.rightEyeMouthRatio + "");
-                Log.v("next step", "List app activity will be launched");
+                Log.v("Eyes_ratio", faceDetailsAvg.eyesRatio + "");
+                Log.v("Left_eye_mouth_ratio", faceDetailsAvg.leftEyeMouthRatio + "");
+                Log.v("Right_eye_mouth_ratio", faceDetailsAvg.rightEyeMouthRatio + "");
                 faceDetailsAvg.eyesRatios.clear();
                 faceDetailsAvg.leftEyeMouthRatios.clear();
                 faceDetailsAvg.rightEyeMouthRatios.clear();

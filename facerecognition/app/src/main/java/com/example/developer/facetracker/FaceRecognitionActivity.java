@@ -5,6 +5,7 @@ package com.example.developer.facetracker;
  */
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +21,8 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_face_recognition);
 
         Button okButton = (Button) findViewById(R.id.okButton);
-
+        SharedPreferences sharedPref = getSharedPreferences("FaceInfo", MODE_PRIVATE);
+        float eyesRatios = sharedPref.getFloat("Eyes_ratio", 0);
         okButton.setOnClickListener(new View.OnClickListener() {
             EditText passwdText = (EditText) findViewById(R.id.password);
             @Override

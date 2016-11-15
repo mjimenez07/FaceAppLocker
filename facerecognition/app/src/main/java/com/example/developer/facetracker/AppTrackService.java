@@ -35,10 +35,10 @@ public class AppTrackService extends Service {
         Log.v("Service to track apps", "Created");
         SharedPreferences sharedPref = getSharedPreferences("AppsToBeBlocked", MODE_PRIVATE);
         final String[] arrayToCheck = sharedPref.getString("ListToTrack", null).split(",");
+        Log.v("string of apps", arrayToCheck.toString());
         Timer timer = new Timer();
         TimerTask refresher = new TimerTask() {
             public void run() {
-                ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
                 String topPackageName = null;
                 Context context = getApplicationContext();
                 UsageStatsManager usage = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
@@ -60,7 +60,6 @@ public class AppTrackService extends Service {
                     Log.v("TrackApps", "Current app " + topPackageName);
                     if (!topPackageName.equalsIgnoreCase("com.example.developer.trackapps")) {
                         if (Arrays.asList(arrayToCheck).contains(topPackageName) && Constants.IS_RUNNING) {
-                            Log.i("TrackApps", "Lanzando tracker");
                             mCurrentApp = topPackageName;
                             Intent intent = new Intent(context, FaceRecognitionActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -78,7 +77,7 @@ public class AppTrackService extends Service {
         };
 
         //TIMER RUNS EVERY 1 SECOND
-        timer.scheduleAtFixedRate(refresher, 0, 3000);
+        timer.scheduleAtFixedRate(refresher, 0, 1000);
     }
 
     @Nullable
