@@ -1,11 +1,9 @@
 package com.example.developer.facetracker;
 
-/**
- * Created by Mario on 11/13/2016.
- */
-
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import com.google.android.gms.vision.CameraSource;
@@ -13,6 +11,7 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
+import com.google.android.gms.vision.face.Landmark;
 import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 import android.util.Log;
 import android.view.View;
@@ -43,7 +42,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
         mCameraSource = new CameraSource.Builder(context, detector)
                 .setRequestedPreviewSize(640,480)
-                .setFacing(CameraSource.CAMERA_FACING_BACK)
+                .setFacing(CameraSource.CAMERA_FACING_FRONT)
                 .setRequestedFps(30.0f)
                 .build();
     }
@@ -99,10 +98,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent startHomescreen=new Intent(Intent.ACTION_MAIN);
-        startHomescreen.addCategory(Intent.CATEGORY_HOME);
-        startHomescreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(startHomescreen);
+        Intent startHomeScreen = new Intent(Intent.ACTION_MAIN);
+        startHomeScreen.addCategory(Intent.CATEGORY_HOME);
+        startHomeScreen.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(startHomeScreen);
         finish();
     }
 
@@ -112,6 +111,13 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         sendBroadcast(intent);
     }
 
+
+
+
+
+    //==============================================================================================
+    // Face Tracker Factory
+    //==============================================================================================
 
     public class FaceTrackerFactory extends Tracker<Face> {
         private FaceGraphic mFaceGraphic;
@@ -127,6 +133,11 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             super.onUpdate(detections, face);
             mGraphicOverlay.add(mFaceGraphic);
 
+            PointF leftEyePosition = getLandMarkPosition(face, Landmark.LEFT_EYE);
+            PointF rightEyePosition = getLandMarkPosition(face, Landmark.RIGHT_EYE);
+            PointF bottomMouthPosition = getLandMarkPosition(face, Landmark.BOTTOM_MOUTH);
+            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
+
             mFaceGraphic.updateFace(face);
         }
 
@@ -135,5 +146,36 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             super.onMissing(detections);
             mGraphicOverlay.remove(mFaceGraphic);
         }
+
+        private PointF getLandMarkPosition(Face face, int landMarkId) {
+            for (Landmark landmark : face.getLandmarks()) {
+                if (landmark.getType() == landMarkId) {
+                    return face.getPosition();
+                }
+            }
+
+            return null;
+        }
+
+        private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
+
+            double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
+            double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
+            double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
+            double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
+            double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
+            double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
+
+            int eyesDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - leftEyeXposition), 2) + Math.pow((rightEyeYposition - leftEyeYposition), 2));
+            int rightEyeMouseDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - bottomMouthXposition), 2) + Math.pow((rightEyeYposition - bottomMouthYposition), 2));
+            int leftEyeMouseDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - bottomMouthXposition), 2) + Math.pow((leftEyeYposition - bottomMouthYposition), 2));
+
+            Log.v("eyes distance", eyesDistance + "");
+            Log.v("righteye-mouse", rightEyeMouseDistance + "");
+            Log.v("lefteye-mouse", leftEyeMouseDistance + "");
+
+        }
+
+
     }
 }

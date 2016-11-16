@@ -10,9 +10,6 @@ import com.google.android.gms.vision.CameraSource;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Created by Mario on 9/13/2016.
- */
 public class GraphicOverlay extends View {
     private final Object mLock = new Object();
     private int mPreviewWidth;
