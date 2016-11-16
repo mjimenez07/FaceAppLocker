@@ -19,12 +19,13 @@ import com.example.developer.facetracker.ui.camera.CameraSourcePreview;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class FaceRecognitionActivity extends AppCompatActivity {
     private CameraSource mCameraSource = null;
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
-
+    static FaceTrackerFactory.FaceDetailsAvg faceDetailsAvg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,12 +170,53 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             int eyesDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - leftEyeXposition), 2) + Math.pow((rightEyeYposition - leftEyeYposition), 2));
             int rightEyeMouseDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - bottomMouthXposition), 2) + Math.pow((rightEyeYposition - bottomMouthYposition), 2));
             int leftEyeMouseDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - bottomMouthXposition), 2) + Math.pow((leftEyeYposition - bottomMouthYposition), 2));
+            int minValue = Math.min(Math.min(eyesDistance, rightEyeMouseDistance), leftEyeMouseDistance);
+
+
+            faceDetailsAvg.eyesRatios.add((double) eyesDistance / minValue);
+            faceDetailsAvg.rightEyeMouthRatios.add((double) rightEyeMouseDistance / minValue);
+            faceDetailsAvg.leftEyeMouthRatios.add((double) leftEyeMouseDistance / minValue);
+            faceDetailsAvg.avg();
 
             Log.v("eyes distance", eyesDistance + "");
             Log.v("righteye-mouse", rightEyeMouseDistance + "");
             Log.v("lefteye-mouse", leftEyeMouseDistance + "");
 
+
+
         }
+
+
+        class FaceDetailsAvg {
+            public ArrayList<Double> eyesRatios = new ArrayList();
+            public ArrayList<Double> rightEyeMouthRatios = new ArrayList();
+            public ArrayList<Double> leftEyeMouthRatios = new ArrayList();
+
+            public double eyesRatio = 0;
+            public double rightEyeMouthRatio = 0;
+            public double leftEyeMouthRatio = 0;
+
+            public void avg() {
+                double tempEyesRatio = 0;
+                for (int index = 0; index < eyesRatios.size(); index++) {
+                    tempEyesRatio += eyesRatios.get(index);
+                }
+                eyesRatio = tempEyesRatio / eyesRatios.size();
+
+                double tempRightEyeMouthRatios = 0;
+                for (int index = 0; index < rightEyeMouthRatios.size(); index++) {
+                    tempRightEyeMouthRatios += rightEyeMouthRatios.get(index);
+                }
+                rightEyeMouthRatio = tempRightEyeMouthRatios / rightEyeMouthRatios.size();
+
+                double tempLeftEyeMouthRatio = 0;
+                for (int index = 0; index < leftEyeMouthRatios.size(); index++) {
+                    tempLeftEyeMouthRatio += leftEyeMouthRatios.get(index);
+                }
+                leftEyeMouthRatio = tempLeftEyeMouthRatio / leftEyeMouthRatios.size();
+            }
+        }
+
 
 
     }
