@@ -26,6 +26,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
     static FaceTrackerFactory.FaceDetailsAvg faceDetailsAvg;
+    int index = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,30 +160,32 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         }
 
         private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
+            while (index <= 20) {
+                double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
+                double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
+                double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
+                double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
+                double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
+                double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
 
-            double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
-            double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
-            double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
-            double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
-            double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
-            double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
-
-            int eyesDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - leftEyeXposition), 2) + Math.pow((rightEyeYposition - leftEyeYposition), 2));
-            int rightEyeMouseDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - bottomMouthXposition), 2) + Math.pow((rightEyeYposition - bottomMouthYposition), 2));
-            int leftEyeMouseDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - bottomMouthXposition), 2) + Math.pow((leftEyeYposition - bottomMouthYposition), 2));
-            int minValue = Math.min(Math.min(eyesDistance, rightEyeMouseDistance), leftEyeMouseDistance);
-
-
-            faceDetailsAvg.eyesRatios.add((double) eyesDistance / minValue);
-            faceDetailsAvg.rightEyeMouthRatios.add((double) rightEyeMouseDistance / minValue);
-            faceDetailsAvg.leftEyeMouthRatios.add((double) leftEyeMouseDistance / minValue);
-            faceDetailsAvg.avg();
-
-            Log.v("eyes distance", eyesDistance + "");
-            Log.v("righteye-mouse", rightEyeMouseDistance + "");
-            Log.v("lefteye-mouse", leftEyeMouseDistance + "");
+                int eyesDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - leftEyeXposition), 2) + Math.pow((rightEyeYposition - leftEyeYposition), 2));
+                int rightEyeMouseDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - bottomMouthXposition), 2) + Math.pow((rightEyeYposition - bottomMouthYposition), 2));
+                int leftEyeMouseDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - bottomMouthXposition), 2) + Math.pow((leftEyeYposition - bottomMouthYposition), 2));
+                int minValue = Math.min(Math.min(eyesDistance, rightEyeMouseDistance), leftEyeMouseDistance);
 
 
+                faceDetailsAvg.eyesRatios.add((double) eyesDistance / minValue);
+                faceDetailsAvg.rightEyeMouthRatios.add((double) rightEyeMouseDistance / minValue);
+                faceDetailsAvg.leftEyeMouthRatios.add((double) leftEyeMouseDistance / minValue);
+                faceDetailsAvg.avg();
+                index++;
+            }
+
+            if (index == 20) {
+                Log.v("eyes distance", faceDetailsAvg.eyesRatio + "");
+                Log.v("righteye-mouse", faceDetailsAvg.rightEyeMouthRatio + "");
+                Log.v("lefteye-mouse", faceDetailsAvg.leftEyeMouthRatio + "");
+            }
 
         }
 
