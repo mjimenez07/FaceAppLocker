@@ -2,7 +2,6 @@ package com.example.developer.facetracker;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,19 +13,19 @@ import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
 import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 import android.util.Log;
-import android.view.View;
 import com.example.developer.facetracker.ui.camera.CameraSourcePreview;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FaceRecognitionActivity extends AppCompatActivity {
     private CameraSource mCameraSource = null;
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
-    static FaceTrackerFactory.FaceDetailsAvg faceDetailsAvg;
-    int index = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +39,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     private void createCameraSource() {
         Context context = getApplicationContext();
 
-        FaceDetector detector = createFaceDetector(context, mPreview);
+        FaceDetector detector = createFaceDetector(context);
 
         mCameraSource = new CameraSource.Builder(context, detector)
                 .setRequestedPreviewSize(640,480)
@@ -49,7 +48,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 .build();
     }
 
-    private FaceDetector createFaceDetector(Context context, CameraSourcePreview mPreview) {
+    private FaceDetector createFaceDetector(Context context) {
         FaceDetector detector = new FaceDetector.Builder(context)
                 .setTrackingEnabled(true)
                 .setProminentFaceOnly(true)
@@ -66,6 +65,12 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             Log.v("FaceDetector", "Face detector dependencies are not yet available");
         }
         return detector;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mPreview.stop();
     }
 
     @Override
@@ -114,81 +119,9 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     }
 
 
-
-
-
-    //==============================================================================================
-    // Face Tracker Factory
-    //==============================================================================================
-
     public class FaceTrackerFactory extends Tracker<Face> {
-        private FaceGraphic mFaceGraphic;
-
-        @Override
-        public void onNewItem(int id, Face item) {
-            super.onNewItem(id, item);
-            mFaceGraphic = new FaceGraphic(mGraphicOverlay);
-        }
-
-        @Override
-        public void onUpdate(FaceDetector.Detections<Face> detections, Face face) {
-            super.onUpdate(detections, face);
-            mGraphicOverlay.add(mFaceGraphic);
-
-            PointF leftEyePosition = getLandMarkPosition(face, Landmark.LEFT_EYE);
-            PointF rightEyePosition = getLandMarkPosition(face, Landmark.RIGHT_EYE);
-            PointF bottomMouthPosition = getLandMarkPosition(face, Landmark.BOTTOM_MOUTH);
-            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
-
-            mFaceGraphic.updateFace(face);
-        }
-
-        @Override
-        public void onMissing(FaceDetector.Detections<Face> detections) {
-            super.onMissing(detections);
-            mGraphicOverlay.remove(mFaceGraphic);
-        }
-
-        private PointF getLandMarkPosition(Face face, int landMarkId) {
-            for (Landmark landmark : face.getLandmarks()) {
-                if (landmark.getType() == landMarkId) {
-                    return face.getPosition();
-                }
-            }
-
-            return null;
-        }
-
-        private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
-            while (index <= 20) {
-                double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
-                double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
-                double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
-                double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
-                double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
-                double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
-
-                int eyesDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - leftEyeXposition), 2) + Math.pow((rightEyeYposition - leftEyeYposition), 2));
-                int rightEyeMouseDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - bottomMouthXposition), 2) + Math.pow((rightEyeYposition - bottomMouthYposition), 2));
-                int leftEyeMouseDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - bottomMouthXposition), 2) + Math.pow((leftEyeYposition - bottomMouthYposition), 2));
-                int minValue = Math.min(Math.min(eyesDistance, rightEyeMouseDistance), leftEyeMouseDistance);
-
-
-                faceDetailsAvg.eyesRatios.add((double) eyesDistance / minValue);
-                faceDetailsAvg.rightEyeMouthRatios.add((double) rightEyeMouseDistance / minValue);
-                faceDetailsAvg.leftEyeMouthRatios.add((double) leftEyeMouseDistance / minValue);
-                faceDetailsAvg.avg();
-                index++;
-            }
-
-            if (index == 20) {
-                Log.v("eyes distance", faceDetailsAvg.eyesRatio + "");
-                Log.v("righteye-mouse", faceDetailsAvg.rightEyeMouthRatio + "");
-                Log.v("lefteye-mouse", faceDetailsAvg.leftEyeMouthRatio + "");
-            }
-
-        }
-
+        public FaceGraphic mFaceGraphic;
+        public int index = 0;
 
         class FaceDetailsAvg {
             public ArrayList<Double> eyesRatios = new ArrayList();
@@ -220,7 +153,101 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             }
         }
 
+        FaceDetailsAvg faceDetailsAvg = new FaceDetailsAvg();
+
+        private Map<Integer, PointF> mPreviousProportions = new HashMap<>();
+
+        @Override
+        public void onNewItem(int id, Face item) {
+            super.onNewItem(id, item);
+            mFaceGraphic = new FaceGraphic(mGraphicOverlay);
+        }
+
+        @Override
+        public void onUpdate(Detector.Detections<Face> detections, Face face) {
+            super.onUpdate(detections, face);
+            mGraphicOverlay.add(mFaceGraphic);
+
+            updatePreviousProportions(face);
+
+            PointF leftEyePosition = getLandmarkPosition(face, Landmark.LEFT_EYE);
+            PointF rightEyePosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
+            PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
+
+            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
+            mFaceGraphic.updateFace(face);
+        }
+
+        @Override
+        public void onMissing(Detector.Detections<Face> detections) {
+            super.onMissing(detections);
+            mGraphicOverlay.remove(mFaceGraphic);
+        }
+
+        @Override
+        public void onDone() {
+            super.onDone();
+            mGraphicOverlay.remove(mFaceGraphic);
+        }
 
 
+        private void updatePreviousProportions(Face face) {
+            for (Landmark landmark : face.getLandmarks()) {
+                PointF position = landmark.getPosition();
+                float xProp = (position.x - face.getPosition().x) / face.getWidth();
+                float yProp = (position.y - face.getPosition().y) / face.getHeight();
+                mPreviousProportions.put(landmark.getType(), new PointF(xProp, yProp));
+            }
+        }
+
+        private PointF getLandmarkPosition(Face face, int landMarkID) {
+            for (Landmark landmark : face.getLandmarks()) {
+                if (landmark.getType() == landMarkID) {
+                    return landmark.getPosition();
+                }
+            }
+
+            PointF prop = mPreviousProportions.get(landMarkID);
+            if (prop == null) {
+                return null;
+            }
+
+            float x = face.getPosition().x + (prop.x * face.getWidth());
+            float y = face.getPosition().y + (prop.y * face.getHeight());
+            return new PointF(x, y);
+        }
+
+
+        private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
+            if (index <= 20) {
+                double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
+                double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
+                double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
+                double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
+                double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
+                double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
+
+                if ((leftEyeXposition != 0) && (leftEyeYposition != 0) && (rightEyeXposition != 0) && (rightEyeYposition != 0) && (bottomMouthXposition != 0) && (bottomMouthYposition != 0)) {
+                    int eyesDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - leftEyeXposition), 2) + Math.pow((rightEyeYposition - leftEyeYposition), 2));
+                    int rightEyeMouseDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - bottomMouthXposition), 2) + Math.pow((rightEyeYposition - bottomMouthYposition), 2));
+                    int leftEyeMouseDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - bottomMouthXposition), 2) + Math.pow((leftEyeYposition - bottomMouthYposition), 2));
+                    int minValue = Math.min(Math.min(eyesDistance, rightEyeMouseDistance), leftEyeMouseDistance);
+
+                    faceDetailsAvg.eyesRatios.add((double) eyesDistance / minValue);
+                    faceDetailsAvg.rightEyeMouthRatios.add((double) rightEyeMouseDistance / minValue);
+                    faceDetailsAvg.leftEyeMouthRatios.add((double) leftEyeMouseDistance / minValue);
+
+                    faceDetailsAvg.avg();
+
+                    index++;
+                }
+            }
+
+            if (index == 20) {
+                Log.v("Eyes distance ratio", faceDetailsAvg.eyesRatio + "");
+                Log.v("lefteyedistanceratio ", faceDetailsAvg.leftEyeMouthRatio+ "");
+                Log.v("righteyedistanceratio ", faceDetailsAvg.rightEyeMouthRatio+ "");
+            }
+        }
     }
 }

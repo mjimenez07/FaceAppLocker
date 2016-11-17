@@ -124,6 +124,12 @@ public class FaceTrackerActivity extends AppCompatActivity {
         mPreview.stop();
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mPreview.stop();
+    }
+
     /**
      * Releases the resources associated with the camera source, the associated detector, and the
      * rest of the processing pipeline.

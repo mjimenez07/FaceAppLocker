@@ -32,10 +32,8 @@ public class AppTrackService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.v("Service to track apps", "Created");
         SharedPreferences sharedPref = getSharedPreferences("AppsToBeBlocked", MODE_PRIVATE);
         final String[] arrayToCheck = sharedPref.getString("ListToTrack", null).split(",");
-        Log.v("string of apps", arrayToCheck.toString());
         Timer timer = new Timer();
         TimerTask refresher = new TimerTask() {
             public void run() {

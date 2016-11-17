@@ -74,6 +74,7 @@ public class FaceTracker extends Tracker<Face> {
      */
     @Override
     public void onNewItem(int faceId, Face face) {
+        super.onNewItem(faceId, face);
         mFaceGraphic = new FaceGraphic(mOverlay);
     }
 
@@ -81,7 +82,8 @@ public class FaceTracker extends Tracker<Face> {
      * Update the position/characteristics of the face within the overlay.
      */
     @Override
-    public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
+    public void onUpdate(FaceDetector.Detections<Face> detections, Face face) {
+        super.onUpdate(detections, face);
         mOverlay.add(mFaceGraphic);
 
         updatePreviousProportions(face);
@@ -101,7 +103,8 @@ public class FaceTracker extends Tracker<Face> {
      * view).
      */
     @Override
-    public void onMissing(FaceDetector.Detections<Face> detectionResults) {
+    public void onMissing(FaceDetector.Detections<Face> detections) {
+        super.onMissing(detections);
         mOverlay.remove(mFaceGraphic);
     }
 
@@ -111,6 +114,7 @@ public class FaceTracker extends Tracker<Face> {
      */
     @Override
     public void onDone() {
+        super.onDone();
         mOverlay.remove(mFaceGraphic);
     }
 
