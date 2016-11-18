@@ -62,6 +62,7 @@ public class AppTrackService extends Service {
                     topPackageName = runningTask.get(runningTask.lastKey()).getPackageName();
                     Log.v("TrackApps", "Current app " + topPackageName);
                     if (!topPackageName.equalsIgnoreCase("com.example.developer.trackapps")) {
+                        Log.v("here", "here");
                         if (Arrays.asList(arrayToCheck).contains(topPackageName) && Constants.IS_RUNNING) {
                             Log.i("TrackApps", "Lanzando tracker");
                             mCurrentApp = topPackageName;
