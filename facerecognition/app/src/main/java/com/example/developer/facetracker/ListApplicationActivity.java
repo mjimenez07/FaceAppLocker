@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -29,6 +30,7 @@ public class ListApplicationActivity extends ListActivity {
     private Vector<ApplicationInstalled> appInstaledlist = new Vector<ApplicationInstalled>();
     private AppAdapter listadapter = null;
     private String listToTrack = "";
+    private String[] arrayToCheck;
 
 
     @Override
@@ -80,12 +82,8 @@ public class ListApplicationActivity extends ListActivity {
     protected void onStop() {
         super.onStop();
         if (hasPermissions()) {
-            for (ApplicationInstalled singleApp: appInstaledlist) {
-                if (singleApp.isActive()) {
-                    listToTrack = listToTrack + singleApp.getAppInfo().packageName + ",";
-                }
-            }
             SharedPreferences.Editor editor = getEditor(getApplicationContext());
+            editor.remove("ListToTrack");
             editor.putString("ListToTrack", listToTrack);
             editor.commit();
             Intent callService = new Intent(this, AppTrackService.class);
@@ -99,15 +97,33 @@ public class ListApplicationActivity extends ListActivity {
         app.setIsActive(!app.isActive());
         listadapter.notifyDataSetChanged();
         Log.v("app name",app.getAppInfo().packageName + " enabled to track " + app.isActive());
+
+        if (app.isActive()  ) {
+            listToTrack = listToTrack + app.getAppInfo().packageName + ",";
+        }
+
+        if (!app.isActive() && listToTrack.contains(app.getAppInfo().packageName)) {
+            listToTrack = listToTrack.replace(app.getAppInfo().packageName, "");
+        }
+
     }
 
     private List<ApplicationInfo> checkForLaunchIntent(List<ApplicationInfo> list) {
         ArrayList<ApplicationInfo> appList = new ArrayList<ApplicationInfo>();
+        SharedPreferences sharedPref = getSharedPreferences("AppsToBeBlocked", MODE_PRIVATE);
+
+        if (sharedPref.getString("ListToTrack", null) != null) {
+            arrayToCheck = sharedPref.getString("ListToTrack", null).split(",");
+        }
 
         for (ApplicationInfo application : list) {
             try {
                 if (((application.flags & ApplicationInfo.FLAG_SYSTEM) == 0) || (application.packageName.contains("google"))) {
-                    appInstaledlist.add(new ApplicationInstalled(application, false));
+                    if (arrayToCheck != null && Arrays.asList(arrayToCheck).contains(application.packageName)) {
+                        appInstaledlist.add(new ApplicationInstalled(application, true));
+                    } else {
+                        appInstaledlist.add(new ApplicationInstalled(application, false));
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
