@@ -21,11 +21,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
 
-/**
- * Created by developer on 11/1/2016.
- */
 public class AppTrackService extends Service {
     private String mCurrentApp;
+    private SharedPreferences sharedPref;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -36,11 +34,11 @@ public class AppTrackService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.v("Service to track apps", "Created");
-        SharedPreferences sharedPref = getSharedPreferences("AppsToBeBlocked", MODE_PRIVATE);
-        final String[] arrayToCheck = sharedPref.getString("ListToTrack", null).split(",");
+        sharedPref = getSharedPreferences("AppsToBeBlocked", MODE_PRIVATE);
         Timer timer = new Timer();
         TimerTask refresher = new TimerTask() {
             public void run() {
+                final String[] arrayToCheck = sharedPref.getString("ListToTrack", null).split(",");
                 ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
                 String topPackageName = null;
                 Context context = getApplicationContext();

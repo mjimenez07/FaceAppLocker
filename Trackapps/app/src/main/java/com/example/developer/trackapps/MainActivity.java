@@ -38,6 +38,7 @@ public class MainActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         packageManager = getPackageManager();
+        listToTrack = getSharedPrerence(getApplicationContext()).getString("ListToTrack", "");
         checkPermissions();
     }
 
@@ -71,7 +72,7 @@ public class MainActivity extends ListActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("MainActivity", "resultCode " + resultCode);
-        switch (requestCode){
+        switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS:
                 checkPermissions();
                 break;
@@ -83,7 +84,6 @@ public class MainActivity extends ListActivity {
         super.onStop();
         if (hasPermissions()) {
             SharedPreferences.Editor editor = getEditor(getApplicationContext());
-            editor.remove("ListToTrack");
             editor.putString("ListToTrack", listToTrack);
             editor.commit();
             Intent callService = new Intent(this, AppTrackService.class);
@@ -96,9 +96,9 @@ public class MainActivity extends ListActivity {
         ApplicationInstalled app = (ApplicationInstalled) listadapter.getItem(position);
         app.setIsActive(!app.isActive());
         listadapter.notifyDataSetChanged();
-        Log.v("app name",app.getAppInfo().packageName + " enabled to track " + app.isActive());
+        Log.v("app name", app.getAppInfo().packageName + " enabled to track " + app.isActive());
 
-        if (app.isActive()  ) {
+        if (app.isActive()) {
             listToTrack = listToTrack + app.getAppInfo().packageName + ",";
         }
 
