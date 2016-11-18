@@ -55,6 +55,7 @@ public class AppAdapter extends BaseAdapter {
         }else {
             viewHolder = (CompleteListViewHolder) view.getTag();
         }
+
         ApplicationInstalled appInfo = appList.get(position);
         viewHolder.appIcon.setImageDrawable(appInfo.getAppInfo().loadIcon(packManager));
         viewHolder.appName.setText(appInfo.getAppInfo().loadLabel(packManager));

@@ -38,6 +38,7 @@ public class ListApplicationActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_application);
         packageManager = getPackageManager();
+        listToTrack = getSharedPrerence(getApplicationContext()).getString("ListToTrack", "");
         checkPermissions();
     }
 
@@ -83,7 +84,6 @@ public class ListApplicationActivity extends ListActivity {
         super.onStop();
         if (hasPermissions()) {
             SharedPreferences.Editor editor = getEditor(getApplicationContext());
-            editor.remove("ListToTrack");
             editor.putString("ListToTrack", listToTrack);
             editor.commit();
             Intent callService = new Intent(this, AppTrackService.class);

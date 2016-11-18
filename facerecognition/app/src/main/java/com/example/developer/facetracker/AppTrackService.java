@@ -23,6 +23,7 @@ import java.util.TreeMap;
 
 public class AppTrackService extends Service {
     private String mCurrentApp;
+    private SharedPreferences sharedPref;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -32,12 +33,12 @@ public class AppTrackService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        SharedPreferences sharedPref = getSharedPreferences("AppsToBeBlocked", MODE_PRIVATE);
-        final String[] arrayToCheck = sharedPref.getString("ListToTrack", null).split(",");
+        sharedPref = getSharedPreferences("AppsToBeBlocked", MODE_PRIVATE);
         Timer timer = new Timer();
         TimerTask refresher = new TimerTask() {
             public void run() {
                 String topPackageName = null;
+                final String[] arrayToCheck = sharedPref.getString("ListToTrack", null).split(",");
                 Context context = getApplicationContext();
                 UsageStatsManager usage = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
                 long time = System.currentTimeMillis();

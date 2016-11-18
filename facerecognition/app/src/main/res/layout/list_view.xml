@@ -1,13 +1,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="#212121"
-    android:padding="16dp">
+    android:layout_height="56dp"
+    android:background="#212121">
 
     <ImageView
         android:id="@+id/app_icon"
         style="@style/ApplicationIcon"
+        android:layout_gravity="center_vertical"
         tools:src="@android:drawable/btn_star_big_off" />
 
     <TextView
