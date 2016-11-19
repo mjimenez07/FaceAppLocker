@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -121,10 +122,14 @@ public class MainActivity extends ListActivity {
 
         if (app.isActive()) {
             listToTrack = listToTrack + app.getAppInfo().packageName + ",";
+            Toast toast = Toast.makeText(getApplicationContext(),"Restricting access to " + app.getAppInfo().loadLabel(packageManager), Toast.LENGTH_SHORT);
+            toast.show();
         }
 
         if (!app.isActive() && listToTrack.contains(app.getAppInfo().packageName)) {
             listToTrack = listToTrack.replace(app.getAppInfo().packageName, "");
+            Toast toast = Toast.makeText(getApplicationContext(),"Enabling access to " + app.getAppInfo().loadLabel(packageManager), Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 
