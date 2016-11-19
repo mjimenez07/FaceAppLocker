@@ -13,21 +13,24 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Vector;
 
 public class ListApplicationActivity extends ListActivity {
     private static final int MY_PERMISSIONS_REQUEST_PACKAGE_USAGE_STATS = 100;
     private PackageManager packageManager = null;
     private List<ApplicationInfo> applist = null;
-    private Vector<ApplicationInstalled> appInstaledlist = new Vector<ApplicationInstalled>();
+    private ArrayList<ApplicationInstalled> appInstaledlist = new ArrayList<ApplicationInstalled>();
     private AppAdapter listadapter = null;
     private String listToTrack = "";
     private String[] arrayToCheck;
@@ -40,6 +43,24 @@ public class ListApplicationActivity extends ListActivity {
         packageManager = getPackageManager();
         listToTrack = getSharedPrerence(getApplicationContext()).getString("ListToTrack", "");
         checkPermissions();
+        EditText searchQuery = (EditText) findViewById(R.id.search_menu);
+
+        searchQuery.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                listadapter.getFilter().filter(charSequence.toString().toLowerCase());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     private void checkPermissions() {
@@ -100,10 +121,14 @@ public class ListApplicationActivity extends ListActivity {
 
         if (app.isActive()  ) {
             listToTrack = listToTrack + app.getAppInfo().packageName + ",";
+            Toast toast = Toast.makeText(getApplicationContext(),"Restricting access to " + app.getAppInfo().loadLabel(packageManager), Toast.LENGTH_SHORT);
+            toast.show();
         }
 
         if (!app.isActive() && listToTrack.contains(app.getAppInfo().packageName)) {
             listToTrack = listToTrack.replace(app.getAppInfo().packageName, "");
+            Toast toast = Toast.makeText(getApplicationContext(),"Enabling access to " + app.getAppInfo().loadLabel(packageManager), Toast.LENGTH_SHORT);
+            toast.show();
         }
 
     }
