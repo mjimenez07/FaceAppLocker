@@ -164,6 +164,7 @@ public class FaceTracker extends Tracker<Face> {
             double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
             double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
 
+
             if ((leftEyeXposition != 0) && (leftEyeYposition != 0) && (rightEyeXposition != 0) && (rightEyeYposition != 0) && (bottomMouthXposition != 0) && (bottomMouthYposition != 0)) {
                 int eyesDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - leftEyeXposition), 2) + Math.pow((rightEyeYposition - leftEyeYposition), 2));
                 int rightEyeMouseDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - bottomMouthXposition), 2) + Math.pow((rightEyeYposition - bottomMouthYposition), 2));
@@ -182,9 +183,9 @@ public class FaceTracker extends Tracker<Face> {
             index++;
         } else {
             SharedPreferences.Editor editor = getEditor(activityContext);
-            editor.putFloat("Eyes_distance_ratio", (float) faceDetailsAvg.eyesRatio);
-            editor.putFloat("Left_eye_bottom_mouth_ratio", (float) faceDetailsAvg.leftEyeMouthRatio);
-            editor.putFloat("Right_eye_bottom_mouth_ratio", (float) faceDetailsAvg.rightEyeMouthRatio);
+            editor.putString("Eyes_distance_ratio", String.format("%.2f", faceDetailsAvg.eyesRatio));
+            editor.putString("Left_eye_bottom_mouth_ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthRatio));
+            editor.putString("Right_eye_bottom_mouth_ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthRatio));
 
             if (editor.commit()) {
                 Log.v("Face information: ", "Saved");

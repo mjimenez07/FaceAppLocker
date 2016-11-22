@@ -2,6 +2,7 @@ package com.example.developer.facetracker;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PointF;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,6 +26,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     private CameraSource mCameraSource = null;
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
+    private SharedPreferences mSharedPref;
+    private String mEyesDistance;
+    private String mLeftEyeMouthDistance;
+    private String mRightEyeMouthDistance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
+        mSharedPref = getSharedPreferences("FaceInfo", MODE_PRIVATE);
+        mEyesDistance = mSharedPref.getString("Eyes_distance_ratio", null);
+        mLeftEyeMouthDistance = mSharedPref.getString("Left_eye_bottom_mouth_ratio", null);
+        mRightEyeMouthDistance = mSharedPref.getString("Right_eye_bottom_mouth_ratio", null);
         createCameraSource();
     }
 
@@ -118,6 +127,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         sendBroadcast(intent);
     }
 
+    public void release() {
+        sendCustomBroadcast();
+        finish();
+    }
 
     public class FaceTrackerFactory extends Tracker<Face> {
         public FaceGraphic mFaceGraphic;
@@ -247,6 +260,18 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 Log.v("Eyes distance ratio", faceDetailsAvg.eyesRatio + "");
                 Log.v("lefteyedistanceratio ", faceDetailsAvg.leftEyeMouthRatio+ "");
                 Log.v("righteyedistanceratio ", faceDetailsAvg.rightEyeMouthRatio+ "");
+
+                if (mEyesDistance != null && mLeftEyeMouthDistance != null && mRightEyeMouthDistance != null) {
+                    if (String.format("%.2f",faceDetailsAvg.eyesRatio) == mEyesDistance && String.format("%.2f", faceDetailsAvg.leftEyeMouthRatio) == mLeftEyeMouthDistance && String.format("%.2f", faceDetailsAvg.rightEyeMouthRatio) == mRightEyeMouthDistance) {
+                        Log.v("Recognize activity","User recognized");
+                        release();
+                    } else {
+                        Log.v("Recognize activity", "User not recognized");
+                        index = 0;
+                    }
+                } else {
+                    Log.v("Distance values:", "are 0");
+                }
             }
         }
     }

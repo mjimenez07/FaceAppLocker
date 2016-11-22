@@ -36,13 +36,7 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
 
     public Map<String, Float> canvasDimensions = new HashMap<>();
 
-    private static final int COLOR_CHOICES[] = {
-            Color.BLUE,
-            Color.CYAN,
-            Color.GREEN,
-            Color.RED,
-            Color.WHITE,
-    };
+    private static final int COLOR_CHOICES = Color.WHITE;
     private static int mCurrentColorIndex = 0;
 
     private Paint mFacePositionPaint;
@@ -55,8 +49,7 @@ public class FaceGraphic  extends GraphicOverlay.Graphic {
     FaceGraphic(GraphicOverlay overlay) {
         super(overlay);
 
-        mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
-        final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
+        final int selectedColor = COLOR_CHOICES;;
 
         mFacePositionPaint = new Paint();
         mFacePositionPaint.setColor(selectedColor);
