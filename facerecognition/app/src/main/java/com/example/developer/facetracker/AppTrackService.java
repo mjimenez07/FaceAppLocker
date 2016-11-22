@@ -56,7 +56,9 @@ public class AppTrackService extends Service {
                     }
 
                     topPackageName = runningTask.get(runningTask.lastKey()).getPackageName();
-                    Log.v("TrackApps", "Current app " + topPackageName);
+
+//                    Log.v("TrackApps", "Current app " + topPackageName); printing current ap in foreground
+
                     if (!topPackageName.equalsIgnoreCase("com.example.developer.trackapps")) {
                         if (Arrays.asList(arrayToCheck).contains(topPackageName) && Constants.IS_RUNNING) {
                             mCurrentApp = topPackageName;

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PointF;
 import android.util.Log;
-import com.example.developer.facetracker.ui.camera.CameraSourcePreview;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
@@ -189,9 +188,9 @@ public class FaceTracker extends Tracker<Face> {
 
             if (editor.commit()) {
                 Log.v("Face information: ", "Saved");
-                Log.v("Eyes_ratio", faceDetailsAvg.eyesRatio + "");
-                Log.v("Left_eye_mouth_ratio", faceDetailsAvg.leftEyeMouthRatio + "");
-                Log.v("Right_eye_mouth_ratio", faceDetailsAvg.rightEyeMouthRatio + "");
+                Log.v("Eyes_distance_ratio", String.format("%.2f", faceDetailsAvg.eyesRatio) );
+                Log.v("Left_eye_mouth_ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthRatio));
+                Log.v("Right_eye_mouth_ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthRatio));
                 faceDetailsAvg.eyesRatios.clear();
                 faceDetailsAvg.leftEyeMouthRatios.clear();
                 faceDetailsAvg.rightEyeMouthRatios.clear();

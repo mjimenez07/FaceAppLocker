@@ -257,9 +257,9 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             }
 
             if (index == 20) {
-                Log.v("Eyes distance ratio", faceDetailsAvg.eyesRatio + "");
-                Log.v("lefteyedistanceratio ", faceDetailsAvg.leftEyeMouthRatio+ "");
-                Log.v("righteyedistanceratio ", faceDetailsAvg.rightEyeMouthRatio+ "");
+                Log.v("Eyes_distance_ratio", String.format("%.2f", faceDetailsAvg.eyesRatio) );
+                Log.v("Left_eye_mouth_ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthRatio));
+                Log.v("Right_eye_mouth_ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthRatio));
 
                 if (mEyesDistance != null && mLeftEyeMouthDistance != null && mRightEyeMouthDistance != null) {
                     if (String.format("%.2f",faceDetailsAvg.eyesRatio) == mEyesDistance && String.format("%.2f", faceDetailsAvg.leftEyeMouthRatio) == mLeftEyeMouthDistance && String.format("%.2f", faceDetailsAvg.rightEyeMouthRatio) == mRightEyeMouthDistance) {

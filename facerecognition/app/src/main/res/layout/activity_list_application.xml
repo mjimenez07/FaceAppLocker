@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#212121"
-
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     tools:context="com.example.developer.facetracker.ListApplicationActivity">
 
     <android.support.v7.widget.Toolbar
