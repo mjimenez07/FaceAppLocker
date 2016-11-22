@@ -23,6 +23,10 @@ public class FaceTracker extends Tracker<Face> {
     public int index = 0;
     private Activity mActivity;
 
+
+    /* class created to handle the distance mapping in order to
+    return an avg of the distances tracked
+     */
     class FaceDetailsAvg {
         public ArrayList<Double> eyesRatios = new ArrayList();
         public ArrayList<Double> rightEyeMouthRatios = new ArrayList();
@@ -117,7 +121,13 @@ public class FaceTracker extends Tracker<Face> {
         mOverlay.remove(mFaceGraphic);
     }
 
-
+    /*
+    * function updatePreviousProportions
+    * here we have a mapping of the landmarks previous positions
+    * to avoid 0 value registration if the face it's removed
+    * from the camera preview overlay
+     * @param face
+    * */
     private void updatePreviousProportions(Face face) {
         for (Landmark landmark : face.getLandmarks()) {
             PointF position = landmark.getPosition();
@@ -151,7 +161,14 @@ public class FaceTracker extends Tracker<Face> {
         return new PointF(x, y);
     }
 
-
+    /**
+     * Function landMarkProcessor
+     * @param  leftEyePosition
+     * @param  rightEyePosition
+     * @param  bottomMouthPosition
+     * this will calculate the distance of each point and save it in the sharedpreference
+     * after that will launch the next activity
+     * */
     private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
         //Here we calculate the distance of each point
 
@@ -205,11 +222,13 @@ public class FaceTracker extends Tracker<Face> {
         }
     }
 
+    //return sharedPrefence instance
     public SharedPreferences getSharedPrerence(Context context) {
         SharedPreferences shrdprefences = context.getSharedPreferences("FaceInfo", Context.MODE_PRIVATE);
         return shrdprefences;
     }
 
+    //return sharedPreference Editor
     public SharedPreferences.Editor getEditor(Context context) {
         return getSharedPrerence(context).edit();
     }

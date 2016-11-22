@@ -63,6 +63,7 @@ public class ListApplicationActivity extends ListActivity {
         });
     }
 
+    //function to determinate if we have permission to usage access
     private void checkPermissions() {
         if (hasPermissions()) {
             new LoadApplications().execute();
@@ -71,6 +72,8 @@ public class ListApplicationActivity extends ListActivity {
         }
     }
 
+
+    //function to show request permission dialog
     private void requestPermission() {
         new AlertDialog.Builder(ListApplicationActivity.this)
                 .setTitle("Request permissions")
@@ -112,6 +115,16 @@ public class ListApplicationActivity extends ListActivity {
         }
     }
 
+
+    /**
+     * function onListItemClickView
+     * @param l
+     * @param v
+     * @param position
+     * @param id
+     * this function will remove or add applications names
+     * from the list of applications to be restricted
+     * */
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         ApplicationInstalled app = (ApplicationInstalled) listadapter.getItem(position);
@@ -191,7 +204,7 @@ public class ListApplicationActivity extends ListActivity {
         return mode == AppOpsManager.MODE_ALLOWED;
     }
 
-
+    //getting shared preference instance
     public SharedPreferences getSharedPrerence(Context context) {
         SharedPreferences shrdprefences = context.getSharedPreferences("AppsToBeBlocked", Context.MODE_PRIVATE);
         return shrdprefences;

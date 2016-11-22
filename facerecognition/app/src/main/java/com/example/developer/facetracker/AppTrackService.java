@@ -1,6 +1,5 @@
 package com.example.developer.facetracker;
 
-import android.app.ActivityManager;
 import android.app.Service;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -68,7 +67,7 @@ public class AppTrackService extends Service {
                         }
 
                         if (mCurrentApp != null && !topPackageName.equalsIgnoreCase(mCurrentApp)) {
-                            Log.i("TrackApps", "Activando servicio");
+                            Log.i("TrackApps", "Service enabled");
                             Constants.IS_RUNNING = true;
                             mCurrentApp = null;
                         }
@@ -101,7 +100,7 @@ public class AppTrackService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             //set the variable to false
-            Log.i("TrackApps", "Desabilitando servicio");
+            Log.i("TrackApps", "Service disabled");
             Constants.IS_RUNNING = false;
         }
     }
