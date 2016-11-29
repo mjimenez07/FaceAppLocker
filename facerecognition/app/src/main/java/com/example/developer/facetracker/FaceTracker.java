@@ -94,8 +94,13 @@ public class FaceTracker extends Tracker<Face> {
         PointF rightEyePosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
         PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
 
-
-        landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
+        face.getEulerY();
+        face.getEulerZ();
+        Log.v("position", "z: " + face.getEulerZ() + "" + "y: " + face.getEulerY() + "");
+        if (face.getEulerZ() == 0 && face.getEulerY() == 0) {
+            Log.v("Face", "right position in front");
+            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
+        }
         mFaceGraphic.updateFace(face);
 
     }

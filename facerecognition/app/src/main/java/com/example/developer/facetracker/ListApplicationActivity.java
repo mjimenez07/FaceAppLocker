@@ -46,7 +46,7 @@ public class ListApplicationActivity extends ListActivity {
         EditText searchQuery = (EditText) findViewById(R.id.search_menu);
 
         searchQuery.addTextChangedListener(new TextWatcher() {
-            @Override
+                @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             }

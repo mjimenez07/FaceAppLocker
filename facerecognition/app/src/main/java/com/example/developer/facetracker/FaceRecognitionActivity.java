@@ -218,8 +218,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             PointF leftEyePosition = getLandmarkPosition(face, Landmark.LEFT_EYE);
             PointF rightEyePosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
             PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
-
-            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
+            
+            if (face.getEulerZ() == 0 && face.getEulerY() == 0) {
+                landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
+            }
             mFaceGraphic.updateFace(face);
         }
 
