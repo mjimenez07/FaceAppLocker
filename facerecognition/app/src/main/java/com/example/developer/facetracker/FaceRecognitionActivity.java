@@ -218,10 +218,8 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             PointF leftEyePosition = getLandmarkPosition(face, Landmark.LEFT_EYE);
             PointF rightEyePosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
             PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
-            
-            if (face.getEulerZ() == 0 && face.getEulerY() == 0) {
-                landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
-            }
+            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
+
             mFaceGraphic.updateFace(face);
         }
 
@@ -300,12 +298,12 @@ public class FaceRecognitionActivity extends AppCompatActivity {
          * */
         private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
             if (index <= 20) {
-                double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
-                double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
-                double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
-                double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
-                double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
-                double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
+                double leftEyeXposition = (double) leftEyePosition.x;
+                double leftEyeYposition = (double) leftEyePosition.y;
+                double rightEyeXposition = (double) rightEyePosition.x;
+                double rightEyeYposition = (double) rightEyePosition.y;
+                double bottomMouthXposition = (double) bottomMouthPosition.x;
+                double bottomMouthYposition = (double) bottomMouthPosition.y;
 
                 if ((leftEyeXposition != 0) && (leftEyeYposition != 0) && (rightEyeXposition != 0) && (rightEyeYposition != 0) && (bottomMouthXposition != 0) && (bottomMouthYposition != 0)) {
                     int eyesDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - leftEyeXposition), 2) + Math.pow((rightEyeYposition - leftEyeYposition), 2));

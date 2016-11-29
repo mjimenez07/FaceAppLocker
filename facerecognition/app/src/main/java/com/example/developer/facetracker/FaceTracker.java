@@ -93,14 +93,8 @@ public class FaceTracker extends Tracker<Face> {
         PointF leftEyePosition = getLandmarkPosition(face, Landmark.LEFT_EYE);
         PointF rightEyePosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
         PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
+        landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
 
-        face.getEulerY();
-        face.getEulerZ();
-        Log.v("position", "z: " + face.getEulerZ() + "" + "y: " + face.getEulerY() + "");
-        if (face.getEulerZ() == 0 && face.getEulerY() == 0) {
-            Log.v("Face", "right position in front");
-            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
-        }
         mFaceGraphic.updateFace(face);
 
     }
@@ -178,12 +172,12 @@ public class FaceTracker extends Tracker<Face> {
         //Here we calculate the distance of each point
 
         if (index < 20) {
-            double leftEyeXposition = (double) leftEyePosition.x * mFaceGraphic.scale;
-            double leftEyeYposition = (double) leftEyePosition.y * mFaceGraphic.scale;
-            double rightEyeXposition = (double) rightEyePosition.x * mFaceGraphic.scale;
-            double rightEyeYposition = (double) rightEyePosition.y * mFaceGraphic.scale;
-            double bottomMouthXposition = (double) bottomMouthPosition.x * mFaceGraphic.scale;
-            double bottomMouthYposition = (double) bottomMouthPosition.y * mFaceGraphic.scale;
+            double leftEyeXposition = (double) leftEyePosition.x;
+            double leftEyeYposition = (double) leftEyePosition.y;
+            double rightEyeXposition = (double) rightEyePosition.x;
+            double rightEyeYposition = (double) rightEyePosition.y;
+            double bottomMouthXposition = (double) bottomMouthPosition.x;
+            double bottomMouthYposition = (double) bottomMouthPosition.y;
 
 
             if ((leftEyeXposition != 0) && (leftEyeYposition != 0) && (rightEyeXposition != 0) && (rightEyeYposition != 0) && (bottomMouthXposition != 0) && (bottomMouthYposition != 0)) {
