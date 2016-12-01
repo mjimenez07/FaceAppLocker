@@ -156,37 +156,8 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         /* class created to handle the distance mapping in order to
         return an avg of the distances tracked
          */
-        class FaceDetailsAvg {
-            public ArrayList<Double> eyesRatios = new ArrayList();
-            public ArrayList<Double> rightEyeMouthRatios = new ArrayList();
-            public ArrayList<Double> leftEyeMouthRatios = new ArrayList();
 
-            public double eyesRatio = 0;
-            public double rightEyeMouthRatio = 0;
-            public double leftEyeMouthRatio = 0;
-
-            public void avg() {
-                double tempEyesRatio = 0;
-                for (int index = 0; index < eyesRatios.size(); index++) {
-                    tempEyesRatio += eyesRatios.get(index);
-                }
-                eyesRatio = tempEyesRatio / eyesRatios.size();
-
-                double tempRightEyeMouthRatios = 0;
-                for (int index = 0; index < rightEyeMouthRatios.size(); index++) {
-                    tempRightEyeMouthRatios += rightEyeMouthRatios.get(index);
-                }
-                rightEyeMouthRatio = tempRightEyeMouthRatios / rightEyeMouthRatios.size();
-
-                double tempLeftEyeMouthRatio = 0;
-                for (int index = 0; index < leftEyeMouthRatios.size(); index++) {
-                    tempLeftEyeMouthRatio += leftEyeMouthRatios.get(index);
-                }
-                leftEyeMouthRatio = tempLeftEyeMouthRatio / leftEyeMouthRatios.size();
-            }
-        }
-
-        FaceDetailsAvg faceDetailsAvg = new FaceDetailsAvg();
+         FaceDetailsProccesor faceDetailsAvg;
 
         // Record the previously seen proportions of the landmark locations relative to the bounding box
         // of the face.  These proportions can be used to approximate where the landmarks are within the
