@@ -16,9 +16,7 @@ import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 import android.util.Log;
 import com.example.developer.facetracker.ui.camera.CameraSourcePreview;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,9 +25,15 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     private CameraSourcePreview mPreview;
     private GraphicOverlay mGraphicOverlay;
     private SharedPreferences mSharedPref;
-    private String mEyesDistance;
-    private String mLeftEyeMouthDistance;
-    private String mRightEyeMouthDistance;
+    private String mEyesDistanceRatio;
+    private String mRightEyeNoseBaseDistanceRatio;
+    private String mLeftEyeNoseBaseDistanceRatio;
+    private String mNoseBaseMouthDistanceRatio;
+    private String mRightMouthLeftMouthDistanceRatio;
+    private String mRightMouthBottomMouthDistanceRatio;
+    private String mLeftMouthBottomMouthDistanceRatio;
+    private String mRightEyeMouthDistanceRatio;
+    private String mLeftEyeMouthDistanceRatio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +43,16 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
         mGraphicOverlay = (GraphicOverlay) findViewById(R.id.faceOverlay);
         mSharedPref = getSharedPreferences("FaceInfo", MODE_PRIVATE);
-        mEyesDistance = mSharedPref.getString("Eyes_distance_ratio", null);
-        mLeftEyeMouthDistance = mSharedPref.getString("Left_eye_bottom_mouth_ratio", null);
-        mRightEyeMouthDistance = mSharedPref.getString("Right_eye_bottom_mouth_ratio", null);
+        mEyesDistanceRatio = mSharedPref.getString( getString(R.string.eyes_distance_ratio), null );
+        mRightEyeNoseBaseDistanceRatio = mSharedPref.getString( getString( R.string.right_eye_nose_base_distance_ratio ), null );
+        mLeftEyeNoseBaseDistanceRatio = mSharedPref.getString( getString( R.string.left_eye_nose_base_distance_ratio ), null);
+        mNoseBaseMouthDistanceRatio = mSharedPref.getString( getString( R.string.nose_base_bottom_mouth_distance_ratio ), null );
+        mRightMouthLeftMouthDistanceRatio = mSharedPref.getString( getString( R.string.right_mouth_left_mouth_distance_ratio ), null );
+        mRightMouthBottomMouthDistanceRatio = mSharedPref.getString( getString( R.string.right_mouth_bottom_mouth_distance_ratio ), null );
+        mLeftMouthBottomMouthDistanceRatio = mSharedPref.getString( getString( R.string.left_mouth_bottom_mouth_distance_ratio ), null );
+        mRightEyeMouthDistanceRatio = mSharedPref.getString( getString( R.string.right_eye_bottom_mouth_distance_ratio ), null );
+        mLeftEyeMouthDistanceRatio = mSharedPref.getString( getString( R.string.left_eye_bottom_mouth_distance_ratio ), null );
+
         createCameraSource();
     }
 
@@ -157,7 +168,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         return an avg of the distances tracked
          */
 
-         FaceDetailsProccesor faceDetailsAvg;
+         public FaceDetailsProcessor faceDetailsAvg;
 
         // Record the previously seen proportions of the landmark locations relative to the bounding box
         // of the face.  These proportions can be used to approximate where the landmarks are within the
@@ -186,10 +197,20 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
             updatePreviousProportions(face);
 
-            PointF leftEyePosition = getLandmarkPosition(face, Landmark.LEFT_EYE);
-            PointF rightEyePosition = getLandmarkPosition(face, Landmark.RIGHT_EYE);
-            PointF bottomMouthPosition = getLandmarkPosition(face, Landmark.BOTTOM_MOUTH);
-            landMarkProcessor(leftEyePosition, rightEyePosition, bottomMouthPosition);
+            PointF leftEyePosition = getLandmarkPosition( face, Landmark.LEFT_EYE );
+
+            PointF rightEyePosition = getLandmarkPosition( face, Landmark.RIGHT_EYE );
+
+            PointF noseBasePosition = getLandmarkPosition( face, Landmark.NOSE_BASE );
+
+            PointF rightMouthPosition = getLandmarkPosition( face, Landmark.RIGHT_MOUTH );
+
+            PointF leftMouthPosition = getLandmarkPosition( face, Landmark.LEFT_MOUTH );
+
+            PointF bottomMouthPosition = getLandmarkPosition( face, Landmark.BOTTOM_MOUTH );
+
+
+            landMarkProcessor( leftEyePosition, rightEyePosition, noseBasePosition, leftMouthPosition, rightMouthPosition, bottomMouthPosition );
 
             mFaceGraphic.updateFace(face);
         }
@@ -259,62 +280,106 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         }
 
 
+
         /**
          * Function landMarkProcessor
          * @param  leftEyePosition
          * @param  rightEyePosition
-         * @param  bottomMouthPosition
+         * @param  noseBasePosition
+         * @param  leftMouthPosition
+         * @param  rightMouthPosition
+         * @param bottomMouthPosition
          * this will calculate the distance of each point and save it in the sharedpreference
          * after that will launch the next activity
          * */
-        private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF bottomMouthPosition) {
-            if (index <= 20) {
-                double leftEyeXposition = (double) leftEyePosition.x;
-                double leftEyeYposition = (double) leftEyePosition.y;
-                double rightEyeXposition = (double) rightEyePosition.x;
-                double rightEyeYposition = (double) rightEyePosition.y;
-                double bottomMouthXposition = (double) bottomMouthPosition.x;
-                double bottomMouthYposition = (double) bottomMouthPosition.y;
+        private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF noseBasePosition, PointF leftMouthPosition, PointF rightMouthPosition, PointF bottomMouthPosition) {
+            //Here we calculate the distance of each point
 
-                if ((leftEyeXposition != 0) && (leftEyeYposition != 0) && (rightEyeXposition != 0) && (rightEyeYposition != 0) && (bottomMouthXposition != 0) && (bottomMouthYposition != 0)) {
-                    int eyesDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - leftEyeXposition), 2) + Math.pow((rightEyeYposition - leftEyeYposition), 2));
-                    int rightEyeMouseDistance = (int) Math.sqrt(Math.pow((rightEyeXposition - bottomMouthXposition), 2) + Math.pow((rightEyeYposition - bottomMouthYposition), 2));
-                    int leftEyeMouseDistance = (int) Math.sqrt(Math.pow((leftEyeXposition - bottomMouthXposition), 2) + Math.pow((leftEyeYposition - bottomMouthYposition), 2));
-                    int minValue = Math.min(Math.min(eyesDistance, rightEyeMouseDistance), leftEyeMouseDistance);
+            if (index < 20) {
+                double leftEyeXPosition = (double) leftEyePosition.x;
+                double leftEyeYPosition = (double) leftEyePosition.y;
 
-                    faceDetailsAvg.eyesRatios.add((double) eyesDistance / minValue);
-                    faceDetailsAvg.rightEyeMouthRatios.add((double) rightEyeMouseDistance / minValue);
-                    faceDetailsAvg.leftEyeMouthRatios.add((double) leftEyeMouseDistance / minValue);
+                double rightEyeXPosition = (double) rightEyePosition.x;
+                double rightEyeYPosition = (double) rightEyePosition.y;
+
+                double noseBaseXPosition = (double) noseBasePosition.x;
+                double noseBaseYPosition = (double) noseBasePosition.y;
+
+                double leftMouthXPosition = (double) leftMouthPosition.x;
+                double leftMouthYPosition = (double) leftMouthPosition.y;
+
+                double rightMouthXPosition = (double) rightMouthPosition.x;
+                double rightMouthYPosition = (double) rightMouthPosition.y;
+
+                double bottomMouthXPosition = (double) bottomMouthPosition.x;
+                double bottomMouthYPosition = (double) bottomMouthPosition.y;
+
+
+                if ( ( leftEyeXPosition != 0 ) && ( leftEyeYPosition != 0 ) && ( rightEyeXPosition != 0 )
+                        && ( rightEyeYPosition != 0 ) && ( bottomMouthXPosition != 0 )
+                        && ( noseBaseXPosition !=0 ) && ( noseBaseYPosition !=0 )
+                        && ( leftMouthXPosition !=0 ) && ( leftMouthYPosition !=0 )
+                        && ( rightMouthXPosition !=0 ) && ( rightMouthYPosition !=0 )
+                        && ( bottomMouthYPosition != 0 ) ) {
+
+                    int eyesDistance = (int) Math.sqrt( Math.pow( ( rightEyeXPosition - leftEyeXPosition ), 2 ) + Math.pow( ( rightEyeYPosition - leftEyeYPosition), 2 ) );
+
+                    int rightEyeNoseBaseDistance = (int) Math.sqrt( Math.pow( ( rightEyeXPosition - noseBaseXPosition ), 2 ) + Math.pow( ( rightEyeYPosition - noseBaseYPosition ), 2 ) );
+
+                    int leftEyeNoseBaseDistance = (int) Math.sqrt( Math.pow( ( leftEyeXPosition - noseBaseXPosition ), 2 ) +  Math.pow( ( leftEyeYPosition - noseBaseYPosition ), 2 ) );
+
+                    int noseBaseMouthDistance = (int) Math.sqrt( Math.pow( ( noseBaseXPosition - bottomMouthXPosition ), 2 ) + Math.pow( noseBaseYPosition - bottomMouthYPosition , 2 ) );
+
+                    int rightMouthLeftMouthDistance = (int) Math.sqrt( Math.pow( ( rightMouthXPosition - leftMouthXPosition ) ,2 ) + Math.pow( ( rightMouthYPosition - leftMouthYPosition ), 2 ) );
+
+                    int rightMouthBottomMouthDistance = (int) Math.sqrt( Math.pow( ( rightMouthXPosition - bottomMouthXPosition ),2 )  + Math.pow( ( rightMouthYPosition - bottomMouthYPosition ), 2)  );
+
+                    int leftMouthBottomMouthDistance = (int) Math.sqrt( Math.pow( ( leftMouthXPosition - bottomMouthXPosition ),2 ) + Math.pow( ( leftMouthYPosition - bottomMouthYPosition ), 2 ) );
+
+                    int rightEyeMouthDistance = (int) Math.sqrt(Math.pow( ( rightEyeXPosition - bottomMouthXPosition), 2) + Math.pow((rightEyeYPosition - bottomMouthYPosition ), 2 ) );
+
+                    int leftEyeMouthDistance = (int) Math.sqrt( Math.pow( ( leftEyeXPosition - bottomMouthXPosition), 2) + Math.pow((leftEyeYPosition - bottomMouthYPosition), 2 ) );
+
+                    int minValue = getMinValue( getMinValue(eyesDistance, rightEyeNoseBaseDistance, leftEyeNoseBaseDistance),
+                            getMinValue(noseBaseMouthDistance, rightMouthLeftMouthDistance, rightMouthBottomMouthDistance),
+                            getMinValue(leftMouthBottomMouthDistance, rightEyeMouthDistance, leftEyeMouthDistance));
+
+                    faceDetailsAvg.eyesDistanceValues.add( (double) eyesDistance / minValue );
+                    faceDetailsAvg.rightEyeNoseBaseDistanceValues.add( (double) rightEyeNoseBaseDistance / minValue );
+                    faceDetailsAvg.leftEyeNoseBaseDistanceValues.add( (double) leftEyeNoseBaseDistance / minValue );
+                    faceDetailsAvg.noseBaseMouthDistanceValues.add( (double) noseBaseMouthDistance / minValue );
+                    faceDetailsAvg.rightMouthLeftMouthDistanceValues.add( (double) rightMouthLeftMouthDistance / minValue );
+                    faceDetailsAvg.rightMouthBottomMouthDistanceValues.add( (double) rightMouthBottomMouthDistance / minValue );
+                    faceDetailsAvg.leftMouthBottomMouthDistanceValues.add( (double) leftMouthBottomMouthDistance / minValue );
+                    faceDetailsAvg.rightEyeMouthDistanceValues.add( (double) rightEyeMouthDistance / minValue );
+                    faceDetailsAvg.leftEyeMouthDistanceValues.add( (double) leftEyeMouthDistance / minValue );
 
                     faceDetailsAvg.avg();
 
-                    index++;
-                }
-            }
-
-            if (index == 20) {
-                Log.v("Eyes_distance_ratio", String.format("%.2f", faceDetailsAvg.eyesRatio) );
-                Log.v("Left_eye_mouth_ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthRatio));
-                Log.v("Right_eye_mouth_ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthRatio));
-
-                if (mEyesDistance != null && mLeftEyeMouthDistance != null && mRightEyeMouthDistance != null) {
-                    if (String.format("%.2f",faceDetailsAvg.eyesRatio) == mEyesDistance && String.format("%.2f", faceDetailsAvg.leftEyeMouthRatio) == mLeftEyeMouthDistance && String.format("%.2f", faceDetailsAvg.rightEyeMouthRatio) == mRightEyeMouthDistance) {
-                        Log.v("Recognize activity","User recognized");
-                        release();
-                    } else {
-                        Log.v("Recognize activity", "User not recognized");
-                        faceDetailsAvg.eyesRatios.clear();
-                        faceDetailsAvg.rightEyeMouthRatios.clear();
-                        faceDetailsAvg.leftEyeMouthRatios.clear();
-                        faceDetailsAvg.eyesRatio = 0;
-                        faceDetailsAvg.leftEyeMouthRatio = 0;
-                        faceDetailsAvg.rightEyeMouthRatio = 0;
-                        index = 0;
-                    }
                 } else {
-                    Log.v("Distance values:", "are 0");
+                    Log.v("Nothing", "Detected");
+                }
+
+                index++;
+            } else {
+                Log.v("Eyes distance ratio", String.format( "%.2f", faceDetailsAvg.eyesDistanceRatio ) );
+                Log.v("Right eye nose distance", String.format( "%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio ) );
+                Log.v("left eye nose distance", String.format( "%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio ) );
+
+                if (mEyesDistanceRatio != null && mLeftEyeNoseBaseDistanceRatio != null
+                        && mRightEyeNoseBaseDistanceRatio != null && mNoseBaseMouthDistanceRatio != null
+                        && mRightMouthBottomMouthDistanceRatio != null && mLeftMouthBottomMouthDistanceRatio != null
+                        && mRightMouthLeftMouthDistanceRatio != null && mRightEyeMouthDistanceRatio != null
+                        && mLeftEyeMouthDistanceRatio != null ) {
+                    //check if the values taken are the same of the ones saved
+                    // and call the release method.
+
                 }
             }
+        }
+
+        private int getMinValue( int firstDistance, int secondDistance, int thirdDistance) {
+            return Math.min(Math.min( firstDistance, secondDistance ), thirdDistance );
         }
     }
 }

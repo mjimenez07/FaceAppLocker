@@ -7,4 +7,13 @@
     <string name="title_activity_list_application_activity">list_application_activity</string>
     <string name="title_activity_list_application">ListApplicationActivity</string>
     <string name="broadcast_enable_app_receiver_action">com.example.developer.trackapps.ENABLE_APP"</string>
+    <string name="eyes_distance_ratio">eyes_distance_ratio</string>
+    <string name="right_eye_nose_base_distance_ratio">right_eye_nose_base_distance_ratio</string>
+    <string name="left_eye_nose_base_distance_ratio">left_eye_nose_base_distance_ratio</string>
+    <string name="nose_base_bottom_mouth_distance_ratio">nose_base_bottom_mouth_distance_ratio</string>
+    <string name="right_mouth_left_mouth_distance_ratio">right_mouth_left_mouth_distance_ratio</string>
+    <string name="right_mouth_bottom_mouth_distance_ratio">right_mouth_bottom_mouth_distance_ratio</string>
+    <string name="left_mouth_bottom_mouth_distance_ratio">left_mouth_bottom_mouth_distance_ratio</string>
+    <string name="right_eye_bottom_mouth_distance_ratio">right_eye_bottom_mouth_distance_ratio</string>
+    <string name="left_eye_bottom_mouth_distance_ratio">left_eye_bottom_mouth_distance_ratio</string>
 </resources>
