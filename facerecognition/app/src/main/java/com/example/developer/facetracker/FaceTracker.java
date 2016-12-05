@@ -18,6 +18,7 @@ public class FaceTracker extends Tracker<Face> {
     private GraphicOverlay mOverlay;
     private FaceGraphic mFaceGraphic;
     private Context activityContext;
+    public int count = 0;
     public int index = 0;
     private Activity mActivity;
 
@@ -28,6 +29,8 @@ public class FaceTracker extends Tracker<Face> {
 
     private FaceDetailsProcessor faceDetailsAvg;
 
+    private FaceDetailsProcessorAvg faceDetailsProcessorAvg;
+
     // Record the previously seen proportions of the landmark locations relative to the bounding box
     // of the face.  These proportions can be used to approximate where the landmarks are within the
     // face bounding box if the eye landmark is missing in a future update.
@@ -37,6 +40,7 @@ public class FaceTracker extends Tracker<Face> {
         mOverlay = overlay;
         mFaceGraphic = new FaceGraphic( overlay );
         faceDetailsAvg = new FaceDetailsProcessor();
+        faceDetailsProcessorAvg = new FaceDetailsProcessorAvg();
         mActivity = activity;
         activityContext = context;
     }
@@ -142,11 +146,11 @@ public class FaceTracker extends Tracker<Face> {
 
     /**
      * Function landMarkProcessor
-     * @param  leftEyePosition
-     * @param  rightEyePosition
-     * @param  noseBasePosition
-     * @param  leftMouthPosition
-     * @param  rightMouthPosition
+     * @param leftEyePosition
+     * @param rightEyePosition
+     * @param noseBasePosition
+     * @param leftMouthPosition
+     * @param rightMouthPosition
      * @param bottomMouthPosition
      * this will calculate the distance of each point and save it in the sharedpreference
      * after that will launch the next activity
@@ -154,7 +158,7 @@ public class FaceTracker extends Tracker<Face> {
     private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF noseBasePosition, PointF leftMouthPosition, PointF rightMouthPosition, PointF bottomMouthPosition) {
         //Here we calculate the distance of each point
 
-        if (index < 20) {
+        if (index <= 20) {
             double leftEyeXPosition = (double) leftEyePosition.x;
             double leftEyeYPosition = (double) leftEyePosition.y;
 
@@ -213,7 +217,6 @@ public class FaceTracker extends Tracker<Face> {
                 faceDetailsAvg.rightEyeMouthDistanceValues.add( (double) rightEyeMouthDistance / minValue );
                 faceDetailsAvg.leftEyeMouthDistanceValues.add( (double) leftEyeMouthDistance / minValue );
 
-                faceDetailsAvg.avg();
 
             } else {
                 Log.v("Nothing", "Detected");
@@ -222,52 +225,68 @@ public class FaceTracker extends Tracker<Face> {
             index++;
         } else {
 
-            SharedPreferences.Editor editor = getEditor(activityContext);
-            editor.putString( getResource( R.string.eyes_distance_ratio ), String.format( "%.2f", faceDetailsAvg.eyesDistanceRatio ) );
-            editor.putString( getResource( R.string.right_eye_nose_base_distance_ratio ), String.format( "%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio ) );
-            editor.putString( getResource( R.string.left_eye_nose_base_distance_ratio ), String.format( "%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio ) );
-            editor.putString( getResource( R.string.nose_base_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.noseBaseMouthDistanceRatio ) );
-            editor.putString( getResource( R.string.right_mouth_left_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.rightMouthLeftMouthDistanceRatio ) );
-            editor.putString( getResource( R.string.right_mouth_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.rightMouthBottomMouthDistanceRatio ) );
-            editor.putString( getResource( R.string.left_mouth_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio ) );
-            editor.putString( getResource( R.string.right_eye_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio ) );
-            editor.putString( getResource( R.string.left_eye_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio ) );
+            faceDetailsAvg.avg();
+            if (count <= 5 ) {
+                Log.v("Count", "" + count);
 
-            if (editor.commit()) {
-                Log.v("Face information: ", "Being saved");
-                Log.v("eyes distance ratio", String.format("%.2f", faceDetailsAvg.eyesDistanceRatio));
-                Log.v("righteyenosebase ratio", String.format("%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio));
-                Log.v("lefyetnosebase ratio", String.format("%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio));
-                Log.v("nosebasemouth ratio", String.format("%.2f", faceDetailsAvg.noseBaseMouthDistanceRatio));
-                Log.v("rightmouthleft ratio", String.format("%.2f", faceDetailsAvg.rightMouthLeftMouthDistanceRatio));
-                Log.v("rightmouthBottom ratio", String.format("%.2f", faceDetailsAvg.rightMouthBottomMouthDistanceRatio));
-                Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio));
-                Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio));
-                Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio));
-                faceDetailsAvg.eyesDistanceRatio = 0;
-                faceDetailsAvg.rightEyeNoseBaseDistanceRatio = 0;
-                faceDetailsAvg.leftEyeNoseBaseDistanceRatio = 0;
-                faceDetailsAvg.noseBaseMouthDistanceRatio = 0;
-                faceDetailsAvg.rightMouthLeftMouthDistanceRatio = 0;
-                faceDetailsAvg.rightMouthBottomMouthDistanceRatio = 0;
-                faceDetailsAvg.leftMouthBottomMouthDistanceRatio = 0;
-                faceDetailsAvg.rightEyeMouthDistanceRatio = 0;
-                faceDetailsAvg.leftEyeMouthDistanceRatio = 0;
-                faceDetailsAvg.eyesDistanceValues.clear();
-                faceDetailsAvg.rightEyeNoseBaseDistanceValues.clear();
-                faceDetailsAvg.leftEyeNoseBaseDistanceValues.clear();
-                faceDetailsAvg.noseBaseMouthDistanceValues.clear();
-                faceDetailsAvg.rightMouthLeftMouthDistanceValues.clear();
-                faceDetailsAvg.rightMouthBottomMouthDistanceValues.clear();
-                faceDetailsAvg.leftMouthBottomMouthDistanceValues.clear();
-                faceDetailsAvg.rightEyeMouthDistanceValues.clear();
-                faceDetailsAvg.leftEyeMouthDistanceValues.clear();
+                faceDetailsProcessorAvg.eyesDistanceRatioValues.add(faceDetailsAvg.eyesDistanceRatio);
+                faceDetailsProcessorAvg.rightEyeNoseBaseDistanceRatioValues.add(faceDetailsAvg.rightEyeNoseBaseDistanceRatio);
+                faceDetailsProcessorAvg.leftEyeNoseBaseDistanceRatioValues.add(faceDetailsAvg.leftEyeNoseBaseDistanceRatio);
+                faceDetailsProcessorAvg.noseBaseMouthDistanceRatioValues.add(faceDetailsAvg.noseBaseMouthDistanceRatio);
+                faceDetailsProcessorAvg.rightMouthLeftMouthDistanceRatioValues.add(faceDetailsAvg.rightMouthLeftMouthDistanceRatio);
+                faceDetailsProcessorAvg.rightMouthBottomMouthDistanceRatioValues.add(faceDetailsAvg.rightMouthBottomMouthDistanceRatio);
+                faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioValues.add(faceDetailsAvg.leftMouthBottomMouthDistanceRatio);
+                faceDetailsProcessorAvg.rightEyeMouthDistanceRatioValues.add(faceDetailsAvg.rightEyeMouthDistanceRatio);
+                faceDetailsProcessorAvg.leftEyeMouthDistanceRatioValues.add(faceDetailsAvg.leftEyeMouthDistanceRatio);
+                cleanFaceDetailsArray();
+                count++;
                 index = 0;
-                Intent intent = new Intent(activityContext, ListApplicationActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                activityContext.startActivity(intent);
-                mActivity.finish();
             }
+            if (count == 5) {
+                faceDetailsProcessorAvg.approximate();
+            }
+
+
+            Log.v("Face information: ", "Being saved");
+            Log.v("eyes distance ratio", String.format("%.2f", faceDetailsProcessorAvg.eyesDistanceRatioApproximate));
+            Log.v("righteyenosebase ratio", String.format("%.2f", faceDetailsProcessorAvg.rightEyeNoseBaseDistanceRatioApproximate ));
+            Log.v("lefyetnosebase ratio", String.format("%.2f", faceDetailsProcessorAvg.leftEyeNoseBaseDistanceRatioApproximate));
+            Log.v("nosebasemouth ratio", String.format("%.2f", faceDetailsProcessorAvg.noseBaseMouthDistanceRatioApproximate));
+            Log.v("rightmouthleft ratio", String.format("%.2f", faceDetailsProcessorAvg.rightMouthLeftMouthDistanceRatioApproximate));
+            Log.v("rightmouthBottom ratio", String.format("%.2f", faceDetailsProcessorAvg.rightMouthBottomMouthDistanceRatioApproximate));
+            Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioApproximate));
+            Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsProcessorAvg.rightEyeMouthDistanceRatioApproximate));
+            Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsProcessorAvg.leftEyeMouthDistanceRatioApproximate));
+
+//            SharedPreferences.Editor editor = getEditor(activityContext);
+//            editor.putString( getResource( R.string.eyes_distance_ratio ), String.format( "%.2f", faceDetailsAvg.eyesDistanceRatio ) );
+//            editor.putString( getResource( R.string.right_eye_nose_base_distance_ratio ), String.format( "%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio ) );
+//            editor.putString( getResource( R.string.left_eye_nose_base_distance_ratio ), String.format( "%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio ) );
+//            editor.putString( getResource( R.string.nose_base_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.noseBaseMouthDistanceRatio ) );
+//            editor.putString( getResource( R.string.right_mouth_left_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.rightMouthLeftMouthDistanceRatio ) );
+//            editor.putString( getResource( R.string.right_mouth_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.rightMouthBottomMouthDistanceRatio ) );
+//            editor.putString( getResource( R.string.left_mouth_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio ) );
+//            editor.putString( getResource( R.string.right_eye_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio ) );
+//            editor.putString( getResource( R.string.left_eye_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio ) );
+//
+//            if (editor.commit()) {
+//                Log.v("Face information: ", "Being saved");
+//                Log.v("eyes distance ratio", String.format("%.2f", faceDetailsAvg.eyesDistanceRatio));
+//                Log.v("righteyenosebase ratio", String.format("%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio));
+//                Log.v("lefyetnosebase ratio", String.format("%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio));
+//                Log.v("nosebasemouth ratio", String.format("%.2f", faceDetailsAvg.noseBaseMouthDistanceRatio));
+//                Log.v("rightmouthleft ratio", String.format("%.2f", faceDetailsAvg.rightMouthLeftMouthDistanceRatio));
+//                Log.v("rightmouthBottom ratio", String.format("%.2f", faceDetailsAvg.rightMouthBottomMouthDistanceRatio));
+//                Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio));
+//                Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio));
+//                Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio));
+//                cleanFaceDetailsArray();
+//                index = 0;
+//                Intent intent = new Intent(activityContext, ListApplicationActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                activityContext.startActivity(intent);
+//                mActivity.finish();
+//            }
         }
     }
 
@@ -289,4 +308,26 @@ public class FaceTracker extends Tracker<Face> {
     public String getResource( int id ) {
         return mActivity.getApplicationContext().getString( id );
     }
+
+    public void cleanFaceDetailsArray() {
+        faceDetailsAvg.eyesDistanceRatio = 0;
+        faceDetailsAvg.rightEyeNoseBaseDistanceRatio = 0;
+        faceDetailsAvg.leftEyeNoseBaseDistanceRatio = 0;
+        faceDetailsAvg.noseBaseMouthDistanceRatio = 0;
+        faceDetailsAvg.rightMouthLeftMouthDistanceRatio = 0;
+        faceDetailsAvg.rightMouthBottomMouthDistanceRatio = 0;
+        faceDetailsAvg.leftMouthBottomMouthDistanceRatio = 0;
+        faceDetailsAvg.rightEyeMouthDistanceRatio = 0;
+        faceDetailsAvg.leftEyeMouthDistanceRatio = 0;
+        faceDetailsAvg.eyesDistanceValues.clear();
+        faceDetailsAvg.rightEyeNoseBaseDistanceValues.clear();
+        faceDetailsAvg.leftEyeNoseBaseDistanceValues.clear();
+        faceDetailsAvg.noseBaseMouthDistanceValues.clear();
+        faceDetailsAvg.rightMouthLeftMouthDistanceValues.clear();
+        faceDetailsAvg.rightMouthBottomMouthDistanceValues.clear();
+        faceDetailsAvg.leftMouthBottomMouthDistanceValues.clear();
+        faceDetailsAvg.rightEyeMouthDistanceValues.clear();
+        faceDetailsAvg.leftEyeMouthDistanceValues.clear();
+    }
+
 }

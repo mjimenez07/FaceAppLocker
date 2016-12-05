@@ -34,6 +34,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     private String mLeftMouthBottomMouthDistanceRatio;
     private String mRightEyeMouthDistanceRatio;
     private String mLeftEyeMouthDistanceRatio;
+    private FaceDetailsProcessor faceDetailsAvg = new FaceDetailsProcessor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,13 +164,6 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         public int index = 0;
 
 
-
-        /* class created to handle the distance mapping in order to
-        return an avg of the distances tracked
-         */
-
-         public FaceDetailsProcessor faceDetailsAvg;
-
         // Record the previously seen proportions of the landmark locations relative to the bounding box
         // of the face.  These proportions can be used to approximate where the landmarks are within the
         // face bounding box if the eye landmark is missing in a future update.
@@ -282,7 +276,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
 
         /**
-         * Function landMarkProcessor
+         * Function landMa2rkProcessor
          * @param  leftEyePosition
          * @param  rightEyePosition
          * @param  noseBasePosition
@@ -354,25 +348,31 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                     faceDetailsAvg.rightEyeMouthDistanceValues.add( (double) rightEyeMouthDistance / minValue );
                     faceDetailsAvg.leftEyeMouthDistanceValues.add( (double) leftEyeMouthDistance / minValue );
 
-                    faceDetailsAvg.avg();
-
                 } else {
                     Log.v("Nothing", "Detected");
                 }
 
                 index++;
             } else {
-                Log.v("Eyes distance ratio", String.format( "%.2f", faceDetailsAvg.eyesDistanceRatio ) );
-                Log.v("Right eye nose distance", String.format( "%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio ) );
-                Log.v("left eye nose distance", String.format( "%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio ) );
+                faceDetailsAvg.avg();
 
                 if (mEyesDistanceRatio != null && mLeftEyeNoseBaseDistanceRatio != null
                         && mRightEyeNoseBaseDistanceRatio != null && mNoseBaseMouthDistanceRatio != null
                         && mRightMouthBottomMouthDistanceRatio != null && mLeftMouthBottomMouthDistanceRatio != null
                         && mRightMouthLeftMouthDistanceRatio != null && mRightEyeMouthDistanceRatio != null
                         && mLeftEyeMouthDistanceRatio != null ) {
-                    //check if the values taken are the same of the ones saved
-                    // and call the release method.
+                    Log.v("Face information: ", "Tracked");
+                    Log.v("eyes distance ratio", String.format("%.2f", faceDetailsAvg.eyesDistanceRatio));
+                    Log.v("righteyenosebase ratio", String.format("%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio));
+                    Log.v("lefyetnosebase ratio", String.format("%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio));
+                    Log.v("nosebasemouth ratio", String.format("%.2f", faceDetailsAvg.noseBaseMouthDistanceRatio));
+                    Log.v("rightmouthleft ratio", String.format("%.2f", faceDetailsAvg.rightMouthLeftMouthDistanceRatio));
+                    Log.v("rightmouthBottom ratio", String.format("%.2f", faceDetailsAvg.rightMouthBottomMouthDistanceRatio));
+                    Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio));
+                    Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio));
+                    Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio));
+                    cleanFaceDetailsArray();
+                    index = 0;
 
                 }
             }
@@ -380,6 +380,27 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
         private int getMinValue( int firstDistance, int secondDistance, int thirdDistance) {
             return Math.min(Math.min( firstDistance, secondDistance ), thirdDistance );
+        }
+
+        private void cleanFaceDetailsArray() {
+            faceDetailsAvg.eyesDistanceRatio = 0;
+            faceDetailsAvg.rightEyeNoseBaseDistanceRatio = 0;
+            faceDetailsAvg.leftEyeNoseBaseDistanceRatio = 0;
+            faceDetailsAvg.noseBaseMouthDistanceRatio = 0;
+            faceDetailsAvg.rightMouthLeftMouthDistanceRatio = 0;
+            faceDetailsAvg.rightMouthBottomMouthDistanceRatio = 0;
+            faceDetailsAvg.leftMouthBottomMouthDistanceRatio = 0;
+            faceDetailsAvg.rightEyeMouthDistanceRatio = 0;
+            faceDetailsAvg.leftEyeMouthDistanceRatio = 0;
+            faceDetailsAvg.eyesDistanceValues.clear();
+            faceDetailsAvg.rightEyeNoseBaseDistanceValues.clear();
+            faceDetailsAvg.leftEyeNoseBaseDistanceValues.clear();
+            faceDetailsAvg.noseBaseMouthDistanceValues.clear();
+            faceDetailsAvg.rightMouthLeftMouthDistanceValues.clear();
+            faceDetailsAvg.rightMouthBottomMouthDistanceValues.clear();
+            faceDetailsAvg.leftMouthBottomMouthDistanceValues.clear();
+            faceDetailsAvg.rightEyeMouthDistanceValues.clear();
+            faceDetailsAvg.leftEyeMouthDistanceValues.clear();
         }
     }
 }
