@@ -47,7 +47,7 @@ public class FaceTrackerActivity extends AppCompatActivity {
         /**Checking if we already ran the app for the first time and saved user face information
          * if it's true will directly open to the list activity
          */
-        if (sharedPref.contains("Eyes_distance_ratio")) {
+        if ( sharedPref.contains( getString(R.string.eyes_distance_ratio ) ) ) {
             Intent intent = new Intent(getApplicationContext(), ListApplicationActivity.class);
             startActivity(intent);
             finish();

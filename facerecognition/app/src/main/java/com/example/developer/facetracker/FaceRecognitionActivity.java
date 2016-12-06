@@ -35,6 +35,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     private String mRightEyeMouthDistanceRatio;
     private String mLeftEyeMouthDistanceRatio;
     private FaceDetailsProcessor faceDetailsAvg = new FaceDetailsProcessor();
+    private FaceDetailsProcessorAvg faceDetailsProcessorAvg = new FaceDetailsProcessorAvg();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,6 +163,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     public class FaceTrackerFactory extends Tracker<Face> {
         public FaceGraphic mFaceGraphic;
         public int index = 0;
+        public int count = 0;
 
 
         // Record the previously seen proportions of the landmark locations relative to the bounding box
@@ -289,7 +291,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF noseBasePosition, PointF leftMouthPosition, PointF rightMouthPosition, PointF bottomMouthPosition) {
             //Here we calculate the distance of each point
 
-            if (index < 20) {
+            if (index < 10) {
                 double leftEyeXPosition = (double) leftEyePosition.x;
                 double leftEyeYPosition = (double) leftEyePosition.y;
 
@@ -356,25 +358,63 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             } else {
                 faceDetailsAvg.avg();
 
-                if (mEyesDistanceRatio != null && mLeftEyeNoseBaseDistanceRatio != null
-                        && mRightEyeNoseBaseDistanceRatio != null && mNoseBaseMouthDistanceRatio != null
-                        && mRightMouthBottomMouthDistanceRatio != null && mLeftMouthBottomMouthDistanceRatio != null
-                        && mRightMouthLeftMouthDistanceRatio != null && mRightEyeMouthDistanceRatio != null
-                        && mLeftEyeMouthDistanceRatio != null ) {
-                    Log.v("Face information: ", "Tracked");
-                    Log.v("eyes distance ratio", String.format("%.2f", faceDetailsAvg.eyesDistanceRatio));
-                    Log.v("righteyenosebase ratio", String.format("%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio));
-                    Log.v("lefyetnosebase ratio", String.format("%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio));
-                    Log.v("nosebasemouth ratio", String.format("%.2f", faceDetailsAvg.noseBaseMouthDistanceRatio));
-                    Log.v("rightmouthleft ratio", String.format("%.2f", faceDetailsAvg.rightMouthLeftMouthDistanceRatio));
-                    Log.v("rightmouthBottom ratio", String.format("%.2f", faceDetailsAvg.rightMouthBottomMouthDistanceRatio));
-                    Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio));
-                    Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio));
-                    Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio));
-                    cleanFaceDetailsArray();
-                    index = 0;
+                if (count < 4 ) {
+                    Log.v("Count", "" + count);
 
+                    faceDetailsProcessorAvg.eyesDistanceRatioValues.add(faceDetailsAvg.eyesDistanceRatio);
+                    faceDetailsProcessorAvg.rightEyeNoseBaseDistanceRatioValues.add(faceDetailsAvg.rightEyeNoseBaseDistanceRatio);
+                    faceDetailsProcessorAvg.leftEyeNoseBaseDistanceRatioValues.add(faceDetailsAvg.leftEyeNoseBaseDistanceRatio);
+                    faceDetailsProcessorAvg.noseBaseMouthDistanceRatioValues.add(faceDetailsAvg.noseBaseMouthDistanceRatio);
+                    faceDetailsProcessorAvg.rightMouthLeftMouthDistanceRatioValues.add(faceDetailsAvg.rightMouthLeftMouthDistanceRatio);
+                    faceDetailsProcessorAvg.rightMouthBottomMouthDistanceRatioValues.add(faceDetailsAvg.rightMouthBottomMouthDistanceRatio);
+                    faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioValues.add(faceDetailsAvg.leftMouthBottomMouthDistanceRatio);
+                    faceDetailsProcessorAvg.rightEyeMouthDistanceRatioValues.add(faceDetailsAvg.rightEyeMouthDistanceRatio);
+                    faceDetailsProcessorAvg.leftEyeMouthDistanceRatioValues.add(faceDetailsAvg.leftEyeMouthDistanceRatio);
+                    cleanFaceDetailsArray();
+                    count++;
+                    index = 0;
                 }
+                if (count == 4) {
+                    faceDetailsProcessorAvg.approximate();
+                    Log.v("faceapplocker", "printing calculated values");
+
+                    Log.v("eyes distance ratio", String.format("%.2f", faceDetailsProcessorAvg.eyesDistanceRatioApproximate));
+                    Log.v("righteyenosebase ratio", String.format("%.2f", faceDetailsProcessorAvg.rightEyeNoseBaseDistanceRatioApproximate ));
+                    Log.v("lefyetnosebase ratio", String.format("%.2f", faceDetailsProcessorAvg.leftEyeNoseBaseDistanceRatioApproximate));
+                    Log.v("nosebasemouth ratio", String.format("%.2f", faceDetailsProcessorAvg.noseBaseMouthDistanceRatioApproximate));
+                    Log.v("rightmouthleft ratio", String.format("%.2f", faceDetailsProcessorAvg.rightMouthLeftMouthDistanceRatioApproximate));
+                    Log.v("rightmouthBottom ratio", String.format("%.2f", faceDetailsProcessorAvg.rightMouthBottomMouthDistanceRatioApproximate));
+                    Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioApproximate));
+                    Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsProcessorAvg.rightEyeMouthDistanceRatioApproximate));
+                    Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsProcessorAvg.leftEyeMouthDistanceRatioApproximate));
+
+                    if (mEyesDistanceRatio != null && mLeftEyeNoseBaseDistanceRatio != null
+                            && mRightEyeNoseBaseDistanceRatio != null && mNoseBaseMouthDistanceRatio != null
+                            && mRightMouthBottomMouthDistanceRatio != null && mLeftMouthBottomMouthDistanceRatio != null
+                            && mRightMouthLeftMouthDistanceRatio != null && mRightEyeMouthDistanceRatio != null
+                            && mLeftEyeMouthDistanceRatio != null ) {
+
+                        if ( String.format("%.2f", faceDetailsProcessorAvg.eyesDistanceRatioApproximate) == mEyesDistanceRatio
+                                && String.format("%.2f", faceDetailsProcessorAvg.rightEyeNoseBaseDistanceRatioApproximate ) == mRightEyeNoseBaseDistanceRatio
+                                && String.format("%.2f", faceDetailsProcessorAvg.leftEyeNoseBaseDistanceRatioApproximate) == mLeftEyeNoseBaseDistanceRatio
+                                && String.format("%.2f", faceDetailsProcessorAvg.noseBaseMouthDistanceRatioApproximate) == mNoseBaseMouthDistanceRatio
+                                && String.format("%.2f",faceDetailsProcessorAvg.rightMouthLeftMouthDistanceRatioApproximate) == mRightMouthLeftMouthDistanceRatio
+                                && String.format("%.2f", faceDetailsProcessorAvg.rightMouthBottomMouthDistanceRatioApproximate) == mRightMouthBottomMouthDistanceRatio
+                                && String.format("%.2f", faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioApproximate) == mLeftMouthBottomMouthDistanceRatio
+                                && String.format("%.2f", faceDetailsProcessorAvg.rightEyeMouthDistanceRatioApproximate) == mRightEyeMouthDistanceRatio
+                                && String.format("%.2f", faceDetailsProcessorAvg.leftEyeMouthDistanceRatioApproximate) == mLeftEyeMouthDistanceRatio) {
+                            Log.v("faceapplocker", "User Recognized");
+                            release();
+                        } else {
+                            Log.v("faceapplocker", "user not recognized");
+                        }
+                        cleanFaceDetailsArray();
+                    }
+                    cleanFaceDetailsProximities();
+                    index = 0;
+                    count = 0;
+                }
+
             }
         }
 
@@ -402,5 +442,27 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             faceDetailsAvg.rightEyeMouthDistanceValues.clear();
             faceDetailsAvg.leftEyeMouthDistanceValues.clear();
         }
+
+        public void cleanFaceDetailsProximities() {
+            faceDetailsProcessorAvg.eyesDistanceRatioApproximate = 0;
+            faceDetailsProcessorAvg.rightEyeNoseBaseDistanceRatioApproximate  = 0;
+            faceDetailsProcessorAvg.leftEyeNoseBaseDistanceRatioApproximate = 0;
+            faceDetailsProcessorAvg.noseBaseMouthDistanceRatioApproximate = 0;
+            faceDetailsProcessorAvg.rightMouthLeftMouthDistanceRatioApproximate = 0;
+            faceDetailsProcessorAvg.rightMouthBottomMouthDistanceRatioApproximate = 0;
+            faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioApproximate = 0;
+            faceDetailsProcessorAvg.rightEyeMouthDistanceRatioApproximate = 0;
+            faceDetailsProcessorAvg.leftEyeMouthDistanceRatioApproximate = 0;
+            faceDetailsProcessorAvg.eyesDistanceRatioValues.clear();
+            faceDetailsProcessorAvg.rightEyeNoseBaseDistanceRatioValues.clear();
+            faceDetailsProcessorAvg.leftEyeNoseBaseDistanceRatioValues.clear();
+            faceDetailsProcessorAvg.noseBaseMouthDistanceRatioValues.clear();
+            faceDetailsProcessorAvg.rightMouthLeftMouthDistanceRatioValues.clear();
+            faceDetailsProcessorAvg.rightMouthBottomMouthDistanceRatioValues.clear();
+            faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioValues.clear();
+            faceDetailsProcessorAvg.rightEyeMouthDistanceRatioValues.clear();
+            faceDetailsProcessorAvg.leftEyeMouthDistanceRatioValues.clear();
+        }
+
     }
 }

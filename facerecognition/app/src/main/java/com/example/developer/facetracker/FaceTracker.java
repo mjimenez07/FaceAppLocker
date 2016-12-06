@@ -158,7 +158,7 @@ public class FaceTracker extends Tracker<Face> {
     private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF noseBasePosition, PointF leftMouthPosition, PointF rightMouthPosition, PointF bottomMouthPosition) {
         //Here we calculate the distance of each point
 
-        if (index <= 20) {
+        if (index <= 10) {
             double leftEyeXPosition = (double) leftEyePosition.x;
             double leftEyeYPosition = (double) leftEyePosition.y;
 
@@ -226,7 +226,7 @@ public class FaceTracker extends Tracker<Face> {
         } else {
 
             faceDetailsAvg.avg();
-            if (count < 5 ) {
+            if (count < 4 ) {
                 Log.v("Count", "" + count);
 
                 faceDetailsProcessorAvg.eyesDistanceRatioValues.add(faceDetailsAvg.eyesDistanceRatio);
@@ -242,7 +242,7 @@ public class FaceTracker extends Tracker<Face> {
                 count++;
                 index = 0;
             }
-            if (count == 5) {
+            if (count == 4) {
                 faceDetailsProcessorAvg.approximate();
 
                 Log.v("Face information: ", "Being saved");
