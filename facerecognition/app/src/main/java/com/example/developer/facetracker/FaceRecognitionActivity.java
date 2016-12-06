@@ -14,6 +14,8 @@ import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
 import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 import android.util.Log;
+import android.util.Range;
+
 import com.example.developer.facetracker.ui.camera.CameraSourcePreview;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 import java.io.IOException;
@@ -394,15 +396,15 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                             && mRightMouthLeftMouthDistanceRatio != null && mRightEyeMouthDistanceRatio != null
                             && mLeftEyeMouthDistanceRatio != null ) {
 
-                        if ( String.format("%.2f", faceDetailsProcessorAvg.eyesDistanceRatioApproximate) == mEyesDistanceRatio
-                                && String.format("%.2f", faceDetailsProcessorAvg.rightEyeNoseBaseDistanceRatioApproximate ) == mRightEyeNoseBaseDistanceRatio
-                                && String.format("%.2f", faceDetailsProcessorAvg.leftEyeNoseBaseDistanceRatioApproximate) == mLeftEyeNoseBaseDistanceRatio
-                                && String.format("%.2f", faceDetailsProcessorAvg.noseBaseMouthDistanceRatioApproximate) == mNoseBaseMouthDistanceRatio
-                                && String.format("%.2f",faceDetailsProcessorAvg.rightMouthLeftMouthDistanceRatioApproximate) == mRightMouthLeftMouthDistanceRatio
-                                && String.format("%.2f", faceDetailsProcessorAvg.rightMouthBottomMouthDistanceRatioApproximate) == mRightMouthBottomMouthDistanceRatio
-                                && String.format("%.2f", faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioApproximate) == mLeftMouthBottomMouthDistanceRatio
-                                && String.format("%.2f", faceDetailsProcessorAvg.rightEyeMouthDistanceRatioApproximate) == mRightEyeMouthDistanceRatio
-                                && String.format("%.2f", faceDetailsProcessorAvg.leftEyeMouthDistanceRatioApproximate) == mLeftEyeMouthDistanceRatio) {
+                        if ( checkIfInRange(castToDouble(mEyesDistanceRatio), castToDouble(String.format("%.2f", faceDetailsProcessorAvg.eyesDistanceRatioApproximate)))
+                                && checkIfInRange( castToDouble( mRightEyeNoseBaseDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsProcessorAvg.rightEyeNoseBaseDistanceRatioApproximate  )))
+                                && checkIfInRange( castToDouble( mLeftEyeNoseBaseDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsProcessorAvg.leftEyeNoseBaseDistanceRatioApproximate ) ))
+                                && checkIfInRange( castToDouble( mNoseBaseMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsProcessorAvg.noseBaseMouthDistanceRatioApproximate ) ))
+                                && checkIfInRange( castToDouble( mRightMouthLeftMouthDistanceRatio) , castToDouble(String.format("%.2f",faceDetailsProcessorAvg.rightMouthLeftMouthDistanceRatioApproximate ) ))
+                                && checkIfInRange( castToDouble( mRightMouthBottomMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsProcessorAvg.rightMouthBottomMouthDistanceRatioApproximate )))
+                                && checkIfInRange( castToDouble( mLeftMouthBottomMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioApproximate )))
+                                && checkIfInRange( castToDouble( mRightEyeMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsProcessorAvg.rightEyeMouthDistanceRatioApproximate )))
+                                && checkIfInRange( castToDouble( mLeftEyeMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsProcessorAvg.leftEyeMouthDistanceRatioApproximate ) ))) {
                             Log.v("faceapplocker", "User Recognized");
                             release();
                         } else {
@@ -464,5 +466,13 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             faceDetailsProcessorAvg.leftEyeMouthDistanceRatioValues.clear();
         }
 
+
+        public double castToDouble(String value) {
+            return Double.parseDouble(value);
+        }
+        public boolean checkIfInRange(double key, double value) {
+            Range<Double> matches = new Range(key - 0.05, key + 0.05);
+            return matches.contains(value);
+        }
     }
 }

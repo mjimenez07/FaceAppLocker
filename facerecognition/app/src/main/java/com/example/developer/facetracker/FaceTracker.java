@@ -255,7 +255,7 @@ public class FaceTracker extends Tracker<Face> {
                 Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsProcessorAvg.leftMouthBottomMouthDistanceRatioApproximate));
                 Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsProcessorAvg.rightEyeMouthDistanceRatioApproximate));
                 Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsProcessorAvg.leftEyeMouthDistanceRatioApproximate));
-                saveFaceInformation();
+//                saveFaceInformation();
                 cleanFaceDetailsProximities();
                 index = 0;
                 count = 0;
