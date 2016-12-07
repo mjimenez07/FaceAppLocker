@@ -235,7 +235,7 @@ public class FaceTracker extends Tracker<Face> {
             Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio));
             Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio));
             Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio));
-//            saveFaceInformation();
+            saveFaceInformation();
             cleanFaceDetailsArray();
             index = 0;
 
@@ -262,7 +262,6 @@ public class FaceTracker extends Tracker<Face> {
     }
 
     public void cleanFaceDetailsArray() {
-        Log.v("cleaning","here");
         faceDetailsAvg.eyesDistanceRatio = 0;
         faceDetailsAvg.rightEyeNoseBaseDistanceRatio = 0;
         faceDetailsAvg.leftEyeNoseBaseDistanceRatio = 0;
