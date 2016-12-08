@@ -15,10 +15,13 @@ import com.google.android.gms.vision.face.Landmark;
 import com.google.android.gms.vision.face.LargestFaceFocusingProcessor;
 import android.util.Log;
 import android.util.Range;
+import android.widget.Toast;
 
 import com.example.developer.facetracker.ui.camera.CameraSourcePreview;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -154,7 +157,8 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         sendBroadcast(intent);
     }
 
-    public void release() {
+    public void enableAccess() {
+        Log.v("faceapplocker", "User Recognized");
         sendCustomBroadcast();
         finish();
     }
@@ -164,7 +168,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     public class FaceTrackerFactory extends Tracker<Face> {
         public FaceGraphic mFaceGraphic;
         public int index = 0;
-        public int count = 0;
+        public int matches = 0;
 
 
         // Record the previously seen proportions of the landmark locations relative to the bounding box
@@ -358,17 +362,8 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 index++;
             } else {
                 faceDetailsAvg.avg();
-
-                Log.v("Face information: ", "Being saved");
-                Log.v("eyes distance ratio", String.format("%.2f", faceDetailsAvg.eyesDistanceRatio));
-                Log.v("righteyenosebase ratio", String.format("%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio));
-                Log.v("lefyetnosebase ratio", String.format("%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio));
-                Log.v("nosebasemouth ratio", String.format("%.2f", faceDetailsAvg.noseBaseMouthDistanceRatio));
-                Log.v("rightmouthleft ratio", String.format("%.2f", faceDetailsAvg.rightMouthLeftMouthDistanceRatio));
-                Log.v("rightmouthBottom ratio", String.format("%.2f", faceDetailsAvg.rightMouthBottomMouthDistanceRatio));
-                Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio));
-                Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio));
-                Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio));
+                matches = numberOfMatches();
+                Log.v("NumberofMatches: ", " " + matches + "");
 
                 if (mEyesDistanceRatio != null && mLeftEyeNoseBaseDistanceRatio != null
                         && mRightEyeNoseBaseDistanceRatio != null && mNoseBaseMouthDistanceRatio != null
@@ -376,22 +371,15 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                         && mRightMouthLeftMouthDistanceRatio != null && mRightEyeMouthDistanceRatio != null
                         && mLeftEyeMouthDistanceRatio != null ) {
 
-                    if ( checkIfInRange(castToDouble(mEyesDistanceRatio), castToDouble(String.format("%.2f", faceDetailsAvg.eyesDistanceRatio ) ) )
-                            && checkIfInRange( castToDouble( mRightEyeNoseBaseDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio  )))
-                            && checkIfInRange( castToDouble( mLeftEyeNoseBaseDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio ) ))
-                            && checkIfInRange( castToDouble( mNoseBaseMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsAvg.noseBaseMouthDistanceRatio ) ))
-                            && checkIfInRange( castToDouble( mRightMouthLeftMouthDistanceRatio) , castToDouble(String.format("%.2f",faceDetailsAvg.rightMouthLeftMouthDistanceRatio ) ))
-                            && checkIfInRange( castToDouble( mRightMouthBottomMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsAvg.rightMouthBottomMouthDistanceRatio )))
-                            && checkIfInRange( castToDouble( mLeftMouthBottomMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio )))
-                            && checkIfInRange( castToDouble( mRightEyeMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio )))
-                            && checkIfInRange( castToDouble( mLeftEyeMouthDistanceRatio) , castToDouble(String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio ) ))) {
-                        Log.v("faceapplocker", "User Recognized");
-                        release();
+                    if ( matches >= 5 ) {
+                        Log.v("FaceAppLocker", "User can be marked as recognized");
+                        enableAccess();
                     } else {
                         Log.v("faceapplocker", "user not recognized");
                     }
                     cleanFaceDetailsArray();
                     index = 0;
+                    matches = 0;
                 }
             }
         }
@@ -429,6 +417,27 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         public boolean checkIfInRange(double key, double value) {
             Range<Double> matches = new Range(key - 0.08, key + 0.08);
             return matches.contains(value);
+        }
+
+        public int numberOfMatches() {
+            int matches = 0;
+            boolean holder[] = new boolean[9];
+            holder[0] = checkIfInRange( castToDouble( mEyesDistanceRatio), castToDouble( String.format( "%.2f", faceDetailsAvg.eyesDistanceRatio ) ) );
+            holder[1] = checkIfInRange( castToDouble( mRightEyeNoseBaseDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.rightEyeNoseBaseDistanceRatio  ) ) );
+            holder[2] = checkIfInRange( castToDouble( mLeftEyeNoseBaseDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.leftEyeNoseBaseDistanceRatio )  ) );
+            holder[3] = checkIfInRange( castToDouble( mNoseBaseMouthDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.noseBaseMouthDistanceRatio )  ) );
+            holder[4] = checkIfInRange( castToDouble( mRightMouthLeftMouthDistanceRatio ) , castToDouble( String.format( "%.2f",faceDetailsAvg.rightMouthLeftMouthDistanceRatio )  ) );
+            holder[5] = checkIfInRange( castToDouble( mRightMouthBottomMouthDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.rightMouthBottomMouthDistanceRatio ) ) );
+            holder[6] = checkIfInRange( castToDouble( mLeftMouthBottomMouthDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio ) ) );
+            holder[7] = checkIfInRange( castToDouble( mRightEyeMouthDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio ) ) );
+            holder[8] = checkIfInRange( castToDouble( mLeftEyeMouthDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio )  ) );
+            for ( int i = 0; i < holder.length; i++ ) {
+                if ( holder[i] == true ) {
+                    matches++;
+                }
+            }
+
+            return matches;
         }
     }
 }

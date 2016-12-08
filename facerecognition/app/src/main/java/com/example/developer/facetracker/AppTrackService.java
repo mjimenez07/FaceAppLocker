@@ -21,7 +21,7 @@ import java.util.TimerTask;
 import java.util.TreeMap;
 
 public class AppTrackService extends Service {
-    private String mCurrentApp;
+    public String mCurrentApp;
     private SharedPreferences sharedPref;
 
     @Override
@@ -56,7 +56,7 @@ public class AppTrackService extends Service {
 
                     topPackageName = runningTask.get(runningTask.lastKey()).getPackageName();
 
-//                    Log.v("TrackApps", "Current app " + topPackageName); printing current ap in foreground
+//                    Log.v("TrackApps", "Current app runnig in stack " + topPackageName);
 
                     if (!topPackageName.equalsIgnoreCase("com.example.developer.trackapps")) {
                         if (Arrays.asList(arrayToCheck).contains(topPackageName) && Constants.IS_RUNNING) {
