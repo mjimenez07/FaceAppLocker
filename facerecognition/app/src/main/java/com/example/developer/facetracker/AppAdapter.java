@@ -42,7 +42,7 @@ public class AppAdapter extends BaseAdapter implements Filterable {
 
     @Override
     public Object getItem(int position) {
-        return appList.get(position);
+        return filtredList.get(position);
     }
 
     @Override

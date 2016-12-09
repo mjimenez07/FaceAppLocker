@@ -436,6 +436,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             holder[6] = checkIfInRange( castToDouble( mLeftMouthBottomMouthDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio ) ) );
             holder[7] = checkIfInRange( castToDouble( mRightEyeMouthDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio ) ) );
             holder[8] = checkIfInRange( castToDouble( mLeftEyeMouthDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio )  ) );
+
             for ( int i = 0; i < holder.length; i++ ) {
                 if ( holder[i] == true ) {
                     matches++;
