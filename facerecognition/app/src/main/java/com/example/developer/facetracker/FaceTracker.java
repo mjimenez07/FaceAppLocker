@@ -183,27 +183,27 @@ public class FaceTracker extends Tracker<Face> {
                     && ( rightMouthXPosition !=0 ) && ( rightMouthYPosition !=0 )
                     && ( bottomMouthYPosition != 0 ) ) {
 
-                int eyesDistance = (int) Math.sqrt( Math.pow( ( rightEyeXPosition - leftEyeXPosition ), 2 ) + Math.pow( ( rightEyeYPosition - leftEyeYPosition), 2 ) );
+                int eyesDistance = getLandMarkDistance( rightEyeXPosition, rightEyeYPosition, leftEyeXPosition, leftEyeYPosition );
 
-                int rightEyeNoseBaseDistance = (int) Math.sqrt( Math.pow( ( rightEyeXPosition - noseBaseXPosition ), 2 ) + Math.pow( ( rightEyeYPosition - noseBaseYPosition ), 2 ) );
+                int rightEyeNoseBaseDistance = getLandMarkDistance( rightEyeXPosition, rightEyeYPosition, noseBaseXPosition, noseBaseYPosition );
 
-                int leftEyeNoseBaseDistance = (int) Math.sqrt( Math.pow( ( leftEyeXPosition - noseBaseXPosition ), 2 ) +  Math.pow( ( leftEyeYPosition - noseBaseYPosition ), 2 ) );
+                int leftEyeNoseBaseDistance = getLandMarkDistance( leftEyeXPosition, leftEyeYPosition, noseBaseXPosition, noseBaseYPosition );
 
-                int noseBaseMouthDistance = (int) Math.sqrt( Math.pow( ( noseBaseXPosition - bottomMouthXPosition ), 2 ) + Math.pow( noseBaseYPosition - bottomMouthYPosition , 2 ) );
+                int noseBaseMouthDistance = getLandMarkDistance( noseBaseXPosition, noseBaseYPosition, bottomMouthXPosition, bottomMouthYPosition );
 
-                int rightMouthLeftMouthDistance = (int) Math.sqrt( Math.pow( ( rightMouthXPosition - leftMouthXPosition ) ,2 ) + Math.pow( ( rightMouthYPosition - leftMouthYPosition ), 2 ) );
+                int rightMouthLeftMouthDistance = getLandMarkDistance( rightMouthXPosition, rightMouthYPosition, leftMouthXPosition, leftMouthYPosition );
 
-                int rightMouthBottomMouthDistance = (int) Math.sqrt( Math.pow( ( rightMouthXPosition - bottomMouthXPosition ),2 )  + Math.pow( ( rightMouthYPosition - bottomMouthYPosition ), 2)  );
+                int rightMouthBottomMouthDistance = getLandMarkDistance( rightMouthXPosition, rightMouthYPosition, bottomMouthXPosition, bottomMouthYPosition );
 
-                int leftMouthBottomMouthDistance = (int) Math.sqrt( Math.pow( ( leftMouthXPosition - bottomMouthXPosition ),2 ) + Math.pow( ( leftMouthYPosition - bottomMouthYPosition ), 2 ) );
+                int leftMouthBottomMouthDistance = getLandMarkDistance( leftMouthXPosition, leftMouthYPosition, bottomMouthXPosition, bottomMouthYPosition );
 
-                int rightEyeMouthDistance = (int) Math.sqrt(Math.pow( ( rightEyeXPosition - bottomMouthXPosition), 2) + Math.pow((rightEyeYPosition - bottomMouthYPosition ), 2 ) );
+                int rightEyeMouthDistance = getLandMarkDistance( rightEyeXPosition, rightEyeYPosition, bottomMouthXPosition, bottomMouthYPosition  );
 
-                int leftEyeMouthDistance = (int) Math.sqrt( Math.pow( ( leftEyeXPosition - bottomMouthXPosition), 2) + Math.pow((leftEyeYPosition - bottomMouthYPosition), 2 ) );
+                int leftEyeMouthDistance = getLandMarkDistance( leftEyeXPosition, leftEyeYPosition, bottomMouthXPosition, bottomMouthYPosition );
 
-                int minValue = getMinValue( getMinValue(eyesDistance, rightEyeNoseBaseDistance, leftEyeNoseBaseDistance),
-                        getMinValue(noseBaseMouthDistance, rightMouthLeftMouthDistance, rightMouthBottomMouthDistance),
-                        getMinValue(leftMouthBottomMouthDistance, rightEyeMouthDistance, leftEyeMouthDistance));
+                int minValue = getMinValue( getMinValue( eyesDistance, rightEyeNoseBaseDistance, leftEyeNoseBaseDistance ),
+                        getMinValue( noseBaseMouthDistance, rightMouthLeftMouthDistance, rightMouthBottomMouthDistance ),
+                        getMinValue( leftMouthBottomMouthDistance, rightEyeMouthDistance, leftEyeMouthDistance ) );
 
                 faceDetailsAvg.eyesDistanceValues.add( (double) eyesDistance / minValue );
                 faceDetailsAvg.rightEyeNoseBaseDistanceValues.add( (double) rightEyeNoseBaseDistance / minValue );
@@ -244,6 +244,12 @@ public class FaceTracker extends Tracker<Face> {
 
     private int getMinValue( int firstDistance, int secondDistance, int thirdDistance) {
         return Math.min(Math.min( firstDistance, secondDistance ), thirdDistance );
+    }
+
+    public int getLandMarkDistance( double firstPointXPosition, double firstPointYPosition, double secondPointXPosition, double secondPointYPosition ) {
+        int distance;
+        distance = (int) Math.sqrt( Math.pow( ( firstPointXPosition - secondPointXPosition ), 2 ) + Math.pow( ( firstPointYPosition - secondPointYPosition ), 2 ) );
+        return distance;
     }
 
     //return sharedPrefence instance
