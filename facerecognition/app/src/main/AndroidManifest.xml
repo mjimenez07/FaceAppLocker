@@ -7,8 +7,9 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
-        tools:ignore="ProtectedPermissions"/>
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -23,25 +24,27 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <service android:name=".AppTrackService"
-            android:enabled="true">
-        </service>
+        <service
+            android:name=".AppTrackService"
+            android:enabled="true" />
 
         <receiver android:name=".AppTrackService$EnableAppReceiver">
             <intent-filter>
-                <action android:name="com.example.developer.trackapps.ENABLE_APP"></action>
+                <action android:name="com.example.developer.trackapps.ENABLE_APP" />
             </intent-filter>
         </receiver>
 
-        <activity android:name=".FaceTrackerActivity">
+        <activity android:name=".FaceTrackerActivity" />
+        <activity android:name=".ListApplicationActivity" />
+        <activity android:name=".FaceRecognitionActivity" />
+        <activity android:name=".SetPinActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ListApplicationActivity"></activity>
-        <activity android:name=".FaceRecognitionActivity"></activity>
+        <activity android:name=".ConfirmPinActivity"></activity>
     </application>
 
 </manifest>
