@@ -45,6 +45,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ConfirmPinActivity"></activity>
+        <activity android:name=".PinLockActivity"></activity>
     </application>
 
 </manifest>

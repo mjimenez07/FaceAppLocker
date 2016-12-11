@@ -158,7 +158,6 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     }
 
     public void enableAccess() {
-        Log.v("faceapplocker", "User Recognized");
         sendCustomBroadcast();
         finish();
     }
@@ -169,6 +168,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         public FaceGraphic mFaceGraphic;
         public int index = 0;
         public int matches = 0;
+        public int recognitionIntents = 0;
 
 
         // Record the previously seen proportions of the landmark locations relative to the bounding box
@@ -372,14 +372,21 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                         && mLeftEyeMouthDistanceRatio != null ) {
 
                     if ( matches >= 6 ) {
-                        Log.v("FaceAppLocker", "User can be marked as recognized");
+                        Log.v("FaceAppLocker", "User recognized");
                         enableAccess();
                     } else {
                         Log.v("faceapplocker", "user not recognized");
+                        recognitionIntents++;
                     }
                     cleanFaceDetailsArray();
                     index = 0;
                     matches = 0;
+
+                    if ( recognitionIntents == 5 ) {
+                        Log.v("FaceAppLocker","launching lock activity");
+                        startPinLockActivity();
+                        recognitionIntents = 0;
+                    }
                 }
             }
         }
@@ -409,22 +416,22 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             faceDetailsAvg.leftEyeMouthDistanceValues.clear();
         }
 
-        public int getLandMarkDistance( double firstPointXPosition, double firstPointYPosition, double secondPointXPosition, double secondPointYPosition ) {
+        private int getLandMarkDistance( double firstPointXPosition, double firstPointYPosition, double secondPointXPosition, double secondPointYPosition ) {
             int distance;
             distance = (int) Math.sqrt( Math.pow( ( firstPointXPosition - secondPointXPosition ), 2 ) + Math.pow( ( firstPointYPosition - secondPointYPosition ), 2 ) );
             return distance;
         }
 
-        public double castToDouble(String value) {
+        private double castToDouble(String value) {
             return Double.parseDouble(value);
         }
 
-        public boolean checkIfInRange(double key, double value) {
+        private boolean checkIfInRange(double key, double value) {
             Range<Double> matches = new Range(key - 0.08, key + 0.08);
             return matches.contains(value);
         }
 
-        public int numberOfMatches() {
+        private int numberOfMatches() {
             int matches = 0;
             boolean holder[] = new boolean[9];
             holder[0] = checkIfInRange( castToDouble( mEyesDistanceRatio), castToDouble( String.format( "%.2f", faceDetailsAvg.eyesDistanceRatio ) ) );
@@ -438,12 +445,25 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             holder[8] = checkIfInRange( castToDouble( mLeftEyeMouthDistanceRatio ) , castToDouble( String.format( "%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio )  ) );
 
             for ( int i = 0; i < holder.length; i++ ) {
-                if ( holder[i] == true ) {
+                if ( holder[i]) {
                     matches++;
                 }
             }
 
             return matches;
         }
+
+        private void displayMessage(String message) {
+            Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
+        private void startPinLockActivity() {
+            Intent intent = new Intent(getApplicationContext(), PinLockActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        }
+
     }
 }

@@ -1,20 +1,20 @@
 package com.example.developer.facetracker;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class ConfirmPinActivity extends AppCompatActivity {
+public class PinLockActivity extends AppCompatActivity {
     public SharedPreferences mSharedPreference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_confirm_pin);
+        setContentView(R.layout.activity_pin_lock);
         init();
     }
 
@@ -28,16 +28,9 @@ public class ConfirmPinActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (confirmPin.getText().toString().equals(userPassword)){
-                    startFaceTrackerActivity();
+                    Log.v("Pin matched","true");
                 }
             }
         });
-    }
-
-    private void startFaceTrackerActivity() {
-        Intent intent = new Intent(getApplicationContext(), FaceTrackerActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finish();
     }
 }
