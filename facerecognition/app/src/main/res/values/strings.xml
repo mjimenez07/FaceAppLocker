@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">FaceAppLocker</string>
     <string name="ok">OK</string>
-    <string name="pin_hint">the pin must have at least 4 digits.</string>
+    <string name="pin_hint">the pin must have 4 digits</string>
     <string name="pin_value">pin</string>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>

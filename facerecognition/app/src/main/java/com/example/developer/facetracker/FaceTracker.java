@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.util.Log;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;

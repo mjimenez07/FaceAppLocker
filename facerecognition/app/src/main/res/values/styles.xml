@@ -47,4 +47,9 @@
         <item name="android:clickable">false</item>
     </style>
 
+    <style name="PinEdit">
+        <item name="android:textColor">#FAFAFA</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColorHint">#FAFAFA</item>
+    </style>
 </resources>
