@@ -14,12 +14,6 @@
     <EditText
         style="@style/PinEdit"
         android:id="@+id/set_pin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center_horizontal"
-        android:inputType="numberPassword"
-        android:ems="4"
         android:hint="@string/pin_hint"/>
 
 </RelativeLayout>

@@ -51,5 +51,12 @@
         <item name="android:textColor">#FAFAFA</item>
         <item name="android:fontFamily">sans-serif</item>
         <item name="android:textColorHint">#FAFAFA</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:inputType">numberPassword</item>
+        <item name="android:ems">4</item>
+
     </style>
 </resources>
