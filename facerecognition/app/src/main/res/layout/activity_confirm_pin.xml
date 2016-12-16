@@ -15,6 +15,6 @@
     <EditText
         style="@style/PinEdit"
         android:id="@+id/confirm_pin"
-        android:hint="@string/pin_hint"/>n
+        android:hint="@string/confirm_pin"/>n
 
 </RelativeLayout>

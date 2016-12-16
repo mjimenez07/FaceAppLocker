@@ -15,7 +15,7 @@
     <EditText
         style="@style/PinEdit"
         android:id="@+id/confirm_pin"
-        android:hint="@string/pin_hint"/>
+        />
 
 
 

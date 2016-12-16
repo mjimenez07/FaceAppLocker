@@ -243,9 +243,9 @@ public class FaceTracker extends Tracker<Face> {
         }
     }
 
-    private int getMinValue( int firstDistance, int secondDistance, int thirdDistance) {
-        return Math.min(Math.min( firstDistance, secondDistance ), thirdDistance );
-    }
+        private int getMinValue( int firstDistance, int secondDistance, int thirdDistance) {
+            return Math.min(Math.min( firstDistance, secondDistance ), thirdDistance );
+        }
 
     public int getLandMarkDistance( double firstPointXPosition, double firstPointYPosition, double secondPointXPosition, double secondPointYPosition ) {
         int distance;
