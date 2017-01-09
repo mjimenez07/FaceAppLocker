@@ -11,7 +11,6 @@ import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class SetPinActivity extends AppCompatActivity {
 
@@ -47,25 +46,28 @@ public class SetPinActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged( Editable editable ) {
                 if ( editable.length() < 4 ) {
-                    Toast toast = Toast.makeText( getApplicationContext(), "The pin must have 4 digits", Toast.LENGTH_SHORT );
-                    toast.show();
-                } else  {
-                    setPin.setOnEditorActionListener( new TextView.OnEditorActionListener() {
-                        @Override
-                        public boolean onEditorAction( TextView textView, int i, KeyEvent keyEvent ) {
-                            if ( i == EditorInfo.IME_ACTION_GO ) {
-                                editor.putString( "pin", setPin.getText().toString() );
-                                if ( editor.commit() ) {
-                                    startConfirmActivity();
-                                }
-                            }
-                            return false;
-                        }
-                    });
+                    setPin.setError( getString( R.string.pin_invalid_length_error_message ) );
                 }
             }
         });
 
+
+        setPin.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if ( i == EditorInfo.IME_ACTION_GO ) {
+                    if ( setPin.getText().length() == 4 ) {
+                        editor.putString( "pin", setPin.getText().toString() );
+                        if ( editor.commit() ) {
+                            startConfirmActivity();
+                        }
+                    } else  {
+                        setPin.setError( getString( R.string.pin_invalid_length_error_message ) );
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     private void startConfirmActivity() {
@@ -73,7 +75,6 @@ public class SetPinActivity extends AppCompatActivity {
         intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
         startActivity( intent );
         finish();
-
     }
 
     //getting shared preference instance
