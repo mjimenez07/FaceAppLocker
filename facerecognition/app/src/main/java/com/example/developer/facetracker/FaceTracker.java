@@ -103,13 +103,13 @@ public class FaceTracker extends Tracker<Face> {
         mOverlay.remove( mFaceGraphic );
     }
 
-    /*
+    /**
     * function updatePreviousProportions
     * here we have a mapping of the landmarks previous positions
     * to avoid 0 value registration if the face it's removed
     * from the camera preview overlay
      * @param face
-    * */
+    **/
     private void updatePreviousProportions( Face face ) {
         for ( Landmark landmark : face.getLandmarks() ) {
             PointF position = landmark.getPosition();

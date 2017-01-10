@@ -5,6 +5,7 @@
     <string name="pin_value">pin</string>
     <string name="confirm_pin">Confirm PIN</string>
     <string name="pin_invalid_length_error_message">The pin must contain 4 digits</string>
+    <string name="wrong_pin_set_a_new_one">Wrong pin, set a new PIN again</string>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
     <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>

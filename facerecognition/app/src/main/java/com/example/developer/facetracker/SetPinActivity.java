@@ -12,8 +12,12 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class SetPinActivity extends AppCompatActivity {
+import com.example.developer.facetracker.utility.Constants;
 
+public class SetPinActivity extends AppCompatActivity {
+    private EditText setPin;
+    private SharedPreferences.Editor editor;
+    
     @Override
     protected void onCreate( Bundle savedInstanceState ) {
         super.onCreate( savedInstanceState );
@@ -23,51 +27,16 @@ public class SetPinActivity extends AppCompatActivity {
 
 
     private void init() {
-        final EditText setPin = ( EditText ) findViewById( R.id.set_pin );
-        final SharedPreferences.Editor editor = getEditor( getApplicationContext() );
-
-        setPin.addTextChangedListener( new TextWatcher() {
-            @Override
-            public void beforeTextChanged( CharSequence charSequence, int i, int i1, int i2 ) {
-                /**
-                 *  nothing to do here
-                 * ¯\_(ツ)_/¯
-                 * */
-            }
-
-            @Override
-            public void onTextChanged( CharSequence charSequence, int i, int i1, int i2 ) {
-                /**
-                 *  nothing to do here
-                 * ¯\_(ツ)_/¯
-                 * */
-            }
-
-            @Override
-            public void afterTextChanged( Editable editable ) {
-                if ( editable.length() < 4 ) {
-                    setPin.setError( getString( R.string.pin_invalid_length_error_message ) );
-                }
-            }
-        });
+        setPin = ( EditText ) findViewById( R.id.set_pin );
+        editor  = getEditor( getApplicationContext() );
+    }
 
 
-        setPin.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if ( i == EditorInfo.IME_ACTION_GO ) {
-                    if ( setPin.getText().length() == 4 ) {
-                        editor.putString( "pin", setPin.getText().toString() );
-                        if ( editor.commit() ) {
-                            startConfirmActivity();
-                        }
-                    } else  {
-                        setPin.setError( getString( R.string.pin_invalid_length_error_message ) );
-                    }
-                }
-                return false;
-            }
-        });
+    private void confirmPinMatches() {
+        setPin.setText("");
+        setPin.clearFocus();
+        setPin.setHint( getString( R.string.confirm_pin ) );
+
     }
 
     private void startConfirmActivity() {
