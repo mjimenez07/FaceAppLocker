@@ -12,13 +12,14 @@ import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.developer.facetracker.utility.Constants;
 
 public class SetPinActivity extends AppCompatActivity {
     public EditText setPin;
     private SharedPreferences.Editor editor;
-    public SharedPreferences mSharedPreference;
+    public SharedPreferences mSharedPreferences;
     public String pin;
     
     @Override
@@ -65,10 +66,16 @@ public class SetPinActivity extends AppCompatActivity {
                     if ( ( setPin.getText().length() == 4 ) && ( pin.equals("") ) ) {
                         editor.putString( "pin", setPin.getText().toString() );
                         if ( editor.commit() ) {
-                            Log.v("FaceApplocker", "change hint message");
+                            setPin.clearFocus();
+                            setPin.getText().clear();
+                            setPin.setHint( getString( R.string.confirm_pin ) );
                         }
                     } else  {
-                        Log.v("FaceApplocker", "pin to be confirmed");
+                        if ( confirmPin() ) {
+                            Toast neka = Toast.makeText(getApplicationContext(), "supossed to call new activity", Toast.LENGTH_LONG);
+                            neka.show();
+//                            startFaceTrackerActivity();
+                        }
                     }
                 }
                 return false;
@@ -77,8 +84,8 @@ public class SetPinActivity extends AppCompatActivity {
     }
 
     private void setUpEditTextHintMessage() {
-        mSharedPreference = getSharedPreferences( "UserPin", MODE_PRIVATE );
-        pin = mSharedPreference.getString( "pin", "" );
+        mSharedPreferences = getSharedPreferences( "UserPin", MODE_PRIVATE );
+        pin = mSharedPreferences.getString( "pin", "" );
 
         if ( pin.equals("") ) {
             setPin.setHint( getString( R.string.pin_hint ) );
@@ -88,16 +95,13 @@ public class SetPinActivity extends AppCompatActivity {
 
     }
 
-
-    private void confirmPinMatches() {
-        setPin.setText("");
-        setPin.clearFocus();
-        setPin.setHint( getString( R.string.confirm_pin ) );
-
+    private boolean confirmPin() {
+        pin = mSharedPreferences.getString( "pin", "" );
+        return setPin.getText().toString().equals( pin );
     }
 
-    private void startConfirmActivity() {
-        Intent intent = new Intent( getApplicationContext(), ConfirmPinActivity.class );
+    private void startFaceTrackerActivity() {
+        Intent intent = new Intent( getApplicationContext(), FaceTrackerActivity.class );
         intent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
         startActivity( intent );
         finish();
