@@ -33,7 +33,6 @@ public class SetPinActivity extends AppCompatActivity {
     private void init() {
         setPin = ( EditText ) findViewById( R.id.set_pin );
         editor  = getEditor( getApplicationContext() );
-        setUpEditTextHintMessage();
         setPin.addTextChangedListener( new TextWatcher() {
             @Override
             public void beforeTextChanged( CharSequence charSequence, int i, int i1, int i2 ) {
@@ -63,6 +62,7 @@ public class SetPinActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if ( i == EditorInfo.IME_ACTION_GO ) {
+                    setUpEditTextHintMessage();
                     if ( ( setPin.getText().length() == 4 ) && ( pin.equals("") ) ) {
                         editor.putString( "pin", setPin.getText().toString() );
                         if ( editor.commit() ) {
@@ -72,9 +72,11 @@ public class SetPinActivity extends AppCompatActivity {
                         }
                     } else  {
                         if ( confirmPin() ) {
-                            Toast neka = Toast.makeText(getApplicationContext(), "supossed to call new activity", Toast.LENGTH_LONG);
-                            neka.show();
-//                            startFaceTrackerActivity();
+                            startFaceTrackerActivity();
+                        } else {
+                            setPin.clearFocus();
+                            setPin.getText().clear();
+                            setPin.setHint( getString( R.string.wrong_pin_try_again ) );
                         }
                     }
                 }
@@ -86,13 +88,9 @@ public class SetPinActivity extends AppCompatActivity {
     private void setUpEditTextHintMessage() {
         mSharedPreferences = getSharedPreferences( "UserPin", MODE_PRIVATE );
         pin = mSharedPreferences.getString( "pin", "" );
-
-        if ( pin.equals("") ) {
-            setPin.setHint( getString( R.string.pin_hint ) );
-        } else {
+        if ( !pin.equals("") ) {
             setPin.setHint( getString( R.string.confirm_pin ) );
         }
-
     }
 
     private boolean confirmPin() {

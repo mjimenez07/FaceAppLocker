@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PointF;
+import android.os.CountDownTimer;
 import android.util.Log;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
 import com.google.android.gms.vision.Tracker;
@@ -14,6 +15,7 @@ import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 public class FaceTracker extends Tracker<Face> {
     private GraphicOverlay mOverlay;
@@ -236,7 +238,19 @@ public class FaceTracker extends Tracker<Face> {
             Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio));
             Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio));
             Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio));
-            saveFaceInformation();
+            new CountDownTimer(300000, 10000) {
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    mFaceGraphic.mBoxPaint.setColor(Color.GREEN);
+                }
+
+                @Override
+                public void onFinish() {
+                    Log.v("neka", "supposed to call the new activity");
+                }
+            }.start();
+//            saveFaceInformation();
             cleanFaceDetailsArray();
             index = 0;
 
@@ -253,7 +267,7 @@ public class FaceTracker extends Tracker<Face> {
         return distance;
     }
 
-    //return sharedPrefence instance
+    //return sharedPreference instance
     public SharedPreferences getSharedPrerence(Context context) {
         SharedPreferences shrdprefences = context.getSharedPreferences("FaceInfo", Context.MODE_PRIVATE);
         return shrdprefences;

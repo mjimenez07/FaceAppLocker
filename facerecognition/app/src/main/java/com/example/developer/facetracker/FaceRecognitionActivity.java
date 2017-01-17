@@ -363,7 +363,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             } else {
                 faceDetailsAvg.avg();
                 matches = numberOfMatches();
-                Log.v("NumberofMatches: ", " " + matches + "");
+                Log.v("NumberOfMatches: ", " " + matches + "");
 
                 if (mEyesDistanceRatio != null && mLeftEyeNoseBaseDistanceRatio != null
                         && mRightEyeNoseBaseDistanceRatio != null && mNoseBaseMouthDistanceRatio != null
@@ -451,11 +451,6 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             }
 
             return matches;
-        }
-
-        private void displayMessage(String message) {
-            Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
-            toast.show();
         }
 
         private void startPinLockActivity() {
