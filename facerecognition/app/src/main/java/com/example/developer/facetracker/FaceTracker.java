@@ -6,16 +6,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PointF;
-import android.os.CountDownTimer;
 import android.util.Log;
 import com.example.developer.facetracker.ui.camera.GraphicOverlay;
+import com.example.developer.facetracker.utility.Constants;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 import com.google.android.gms.vision.face.Landmark;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 
 public class FaceTracker extends Tracker<Face> {
     private GraphicOverlay mOverlay;
@@ -159,7 +158,8 @@ public class FaceTracker extends Tracker<Face> {
     private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF noseBasePosition, PointF leftMouthPosition, PointF rightMouthPosition, PointF bottomMouthPosition) {
         //Here we calculate the distance of each point
 
-        if (index <= 10) {
+        if ( index <= Constants.NUMBER_OF_ITERATIONS ) {
+
             double leftEyeXPosition = (double) leftEyePosition.x;
             double leftEyeYPosition = (double) leftEyePosition.y;
 
@@ -181,9 +181,9 @@ public class FaceTracker extends Tracker<Face> {
 
             if ( ( leftEyeXPosition != 0 ) && ( leftEyeYPosition != 0 ) && ( rightEyeXPosition != 0 )
                     && ( rightEyeYPosition != 0 ) && ( bottomMouthXPosition != 0 )
-                    && ( noseBaseXPosition !=0 ) && ( noseBaseYPosition !=0 )
-                    && ( leftMouthXPosition !=0 ) && ( leftMouthYPosition !=0 )
-                    && ( rightMouthXPosition !=0 ) && ( rightMouthYPosition !=0 )
+                    && ( noseBaseXPosition != 0 ) && ( noseBaseYPosition != 0 )
+                    && ( leftMouthXPosition != 0 ) && ( leftMouthYPosition != 0 )
+                    && ( rightMouthXPosition != 0 ) && ( rightMouthYPosition != 0 )
                     && ( bottomMouthYPosition != 0 ) ) {
 
                 int eyesDistance = getLandMarkDistance( rightEyeXPosition, rightEyeYPosition, leftEyeXPosition, leftEyeYPosition );
@@ -238,28 +238,16 @@ public class FaceTracker extends Tracker<Face> {
             Log.v("leftmouthBottom ratio", String.format("%.2f", faceDetailsAvg.leftMouthBottomMouthDistanceRatio));
             Log.v("righteyemouth ratio", String.format("%.2f", faceDetailsAvg.rightEyeMouthDistanceRatio));
             Log.v("leftEyemouth ratio", String.format("%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio));
-            new CountDownTimer(300000, 10000) {
-
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    mFaceGraphic.mBoxPaint.setColor(Color.GREEN);
-                }
-
-                @Override
-                public void onFinish() {
-                    Log.v("neka", "supposed to call the new activity");
-                }
-            }.start();
-//            saveFaceInformation();
+            saveFaceInformation();
             cleanFaceDetailsArray();
             index = 0;
 
         }
     }
 
-        private int getMinValue( int firstDistance, int secondDistance, int thirdDistance) {
-            return Math.min(Math.min( firstDistance, secondDistance ), thirdDistance );
-        }
+    private int getMinValue( int firstDistance, int secondDistance, int thirdDistance) {
+        return Math.min(Math.min( firstDistance, secondDistance ), thirdDistance );
+    }
 
     public int getLandMarkDistance( double firstPointXPosition, double firstPointYPosition, double secondPointXPosition, double secondPointYPosition ) {
         int distance;
@@ -317,6 +305,7 @@ public class FaceTracker extends Tracker<Face> {
         editor.putString( getResource( R.string.left_eye_bottom_mouth_distance_ratio ), String.format( "%.2f", faceDetailsAvg.leftEyeMouthDistanceRatio ) );
 
         if (editor.commit()) {
+            mFaceGraphic.mBoxPaint.setColor( Color.GREEN );
             cleanFaceDetailsArray();
             index = 0;
             Intent intent = new Intent(activityContext, ListApplicationActivity.class);
@@ -324,7 +313,6 @@ public class FaceTracker extends Tracker<Face> {
             activityContext.startActivity(intent);
             mActivity.finish();
         }
-
     }
 
 }

@@ -3,9 +3,12 @@ package com.example.developer.facetracker;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.developer.facetracker.utility.Constants;
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
@@ -296,7 +299,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         private void landMarkProcessor(PointF leftEyePosition, PointF rightEyePosition, PointF noseBasePosition, PointF leftMouthPosition, PointF rightMouthPosition, PointF bottomMouthPosition) {
             //Here we calculate the distance of each point
 
-            if (index < 10) {
+            if ( index < Constants.NUMBER_OF_ITERATIONS ) {
                 double leftEyeXPosition = (double) leftEyePosition.x;
                 double leftEyeYPosition = (double) leftEyePosition.y;
 
@@ -371,18 +374,20 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                         && mRightMouthLeftMouthDistanceRatio != null && mRightEyeMouthDistanceRatio != null
                         && mLeftEyeMouthDistanceRatio != null ) {
 
-                    if ( matches >= 6 ) {
+                    if ( matches >= Constants.ACCURACY_LEVEL ) {
+                        mFaceGraphic.mBoxPaint.setColor( Color.GREEN );
                         Log.v("FaceAppLocker", "User recognized");
                         enableAccess();
                     } else {
-                        Log.v("faceapplocker", "user not recognized");
+                        mFaceGraphic.mBoxPaint.setColor( Color.RED );
                         recognitionIntents++;
                     }
                     cleanFaceDetailsArray();
+                    mFaceGraphic.mBoxPaint.setColor( Color.WHITE );
                     index = 0;
                     matches = 0;
 
-                    if ( recognitionIntents == 5 ) {
+                    if ( recognitionIntents == Constants.MAX_RECOGNITION_INTENTS ) {
                         Log.v("FaceAppLocker","launching lock activity");
                         startPinLockActivity();
                         recognitionIntents = 0;
