@@ -1,5 +1,6 @@
 package com.example.developer.facetracker;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,7 +32,7 @@ public class PinLockActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_DONE) {
                     if (confirmPin.getText().toString().equals(userPassword)){
-                        finish();
+                        enableAccess();
                     }
                 }
                 return false;
@@ -44,4 +45,19 @@ public class PinLockActivity extends AppCompatActivity {
         super.onBackPressed();
         return;
     }
+
+    /**
+     * function to notify the service that the current app doesn't need to be tracked anymore
+     * */
+    public  void sendCustomBroadcast() {
+        Intent intent = new Intent();
+        intent.setAction(getString(R.string.broadcast_enable_app_receiver_action));
+        sendBroadcast(intent);
+    }
+
+    public void enableAccess() {
+        sendCustomBroadcast();
+        finish();
+    }
+
 }

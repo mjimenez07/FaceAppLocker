@@ -379,6 +379,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                         Log.v("FaceAppLocker", "User recognized");
                         enableAccess();
                     } else {
+                        Log.v("FaceAppLocker","user not recognized");
                         mFaceGraphic.mBoxPaint.setColor( Color.RED );
                         recognitionIntents++;
                     }
@@ -389,8 +390,9 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
                     if ( recognitionIntents == Constants.MAX_RECOGNITION_INTENTS ) {
                         Log.v("FaceAppLocker","launching lock activity");
-                        startPinLockActivity();
+                        cleanFaceDetailsArray();
                         recognitionIntents = 0;
+                        startPinLockActivity();
                     }
                 }
             }

@@ -60,7 +60,7 @@ public class SetPinActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if ( i == EditorInfo.IME_ACTION_GO ) {
                     setUpEditTextHintMessage();
-                    if ( ( setPin.getText().length() == 4 ) && ( pin.equals("") ) ) {
+                    if ( ( setPin.getText().length() >= 4 ) && ( pin.equals("") ) ) {
                         editor.putString( "pin", setPin.getText().toString() );
                         if ( editor.commit() ) {
                             setPin.clearFocus();
