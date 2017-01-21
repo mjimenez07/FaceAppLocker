@@ -66,6 +66,7 @@ public class SetPinActivity extends AppCompatActivity {
                             setPin.clearFocus();
                             setPin.getText().clear();
                             setPin.setHint( getString( R.string.confirm_pin ) );
+                            setPin.setError(null);
                         }
                     } else  {
                         if ( confirmPin() ) {

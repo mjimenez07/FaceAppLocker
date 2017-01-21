@@ -55,20 +55,19 @@ public class AppTrackService extends Service {
                     }
 
                     topPackageName = runningTask.get(runningTask.lastKey()).getPackageName();
+                    Log.v("Current app", topPackageName);
 
-                    if (!topPackageName.equalsIgnoreCase("com.example.developer.trackapps")) {
-                        if (Arrays.asList(arrayToCheck).contains(topPackageName) && Constants.IS_RUNNING) {
-                            mCurrentApp = topPackageName;
-                            Intent intent = new Intent(context, FaceRecognitionActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            context.startActivity(intent);
-                        }
+                    if (Arrays.asList(arrayToCheck).contains(topPackageName) && Constants.IS_RUNNING) {
+                        mCurrentApp = topPackageName;
+                        Intent intent = new Intent(context, FaceRecognitionActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
 
-                        if (mCurrentApp != null && !topPackageName.equalsIgnoreCase(mCurrentApp)) {
-                            Log.i("TrackApps", "Service enabled");
-                            Constants.IS_RUNNING = true;
-                            mCurrentApp = null;
-                        }
+                    if (mCurrentApp != null && !topPackageName.equalsIgnoreCase(mCurrentApp)) {
+                        Log.i("TrackApps", "Service enabled");
+                        Constants.IS_RUNNING = true;
+                        mCurrentApp = null;
                     }
                 }
             }

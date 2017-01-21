@@ -134,6 +134,7 @@ public class ListApplicationActivity extends ListActivity {
 
         if (app.isActive()  ) {
             listToTrack = listToTrack + app.getAppInfo().packageName + ",";
+            Log.v("App", listToTrack);
             Toast toast = Toast.makeText(getApplicationContext(),"Restricting access to " + app.getAppInfo().loadLabel(packageManager), Toast.LENGTH_SHORT);
             toast.show();
         }
