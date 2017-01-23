@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -33,9 +35,32 @@ public class PinLockActivity extends AppCompatActivity {
                 if (i == EditorInfo.IME_ACTION_DONE) {
                     if (confirmPin.getText().toString().equals(userPassword)){
                         enableAccess();
+                    } else {
+                        confirmPin.clearFocus();
+                        confirmPin.getText().clear();
+                        confirmPin.setHint( getString( R.string.wrong_pin_try_again ) );
                     }
                 }
                 return false;
+            }
+        });
+
+        confirmPin.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (confirmPin.getText().toString().equals(userPassword)) {
+                    enableAccess();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
     }

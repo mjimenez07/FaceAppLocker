@@ -1,7 +1,9 @@
 package com.example.developer.facetracker.utility;
 
 public class Constants {
-
+    /**
+     *  This will be sent in the broadcast in order to pause the service of restricting access
+     *  to the current app*/
     public static boolean IS_RUNNING = true;
 
     /**
@@ -17,6 +19,9 @@ public class Constants {
      * */
     public static int ACCURACY_LEVEL = 6;
 
-    public static int MAX_RECOGNITION_INTENTS = 5;
+    /**
+     * Amount of times that the face Recognition activity will try to recognize the user
+     * before launching the pin activity*/
+    public static int MAX_RECOGNITION_INTENTS = 10;
 
 }
