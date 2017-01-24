@@ -17,7 +17,7 @@ public class Constants {
      * current level is 6, if you want it to be more strict feel free to change it
      * from 7 - 9, currently with 6 it's working perfectly
      * */
-    public static int ACCURACY_LEVEL = 6;
+    public static int ACCURACY_LEVEL = 8;
 
     /**
      * Amount of times that the face Recognition activity will try to recognize the user
